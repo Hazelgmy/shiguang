@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>拾光手账 🌿</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+            @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap");
 
             * {
                 box-sizing: border-box;
@@ -37,7 +37,7 @@
             #lock-screen {
                 position: fixed;
                 inset: 0;
-                background: radial-gradient(ellipse at 50% 35%, #FBF8F3 0%, #F3EDE2 55%, #E8DFCF 100%);
+                background: radial-gradient(ellipse at 50% 35%, #fbf8f3 0%, #f3ede2 55%, #e8dfcf 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -45,15 +45,13 @@
             }
 
             .lock-card {
-                background: #FFFCF7;
-                border: 1px solid rgba(139, 115, 85, 0.10);
+                background: #fffcf7;
+                border: 1px solid rgba(139, 115, 85, 0.1);
                 border-radius: 28px;
                 padding: 3.2rem 2.6rem;
                 width: 360px;
                 text-align: center;
-                box-shadow:
-                    0 1px 2px rgba(92, 78, 56, 0.03),
-                    0 8px 40px rgba(92, 78, 56, 0.05),
+                box-shadow: 0 1px 2px rgba(92, 78, 56, 0.03), 0 8px 40px rgba(92, 78, 56, 0.05),
                     0 24px 80px rgba(92, 78, 56, 0.03);
             }
 
@@ -71,14 +69,14 @@
                 font-family: "Playfair Display", "Noto Serif SC", "PingFang SC", serif;
                 font-size: 2rem;
                 font-weight: 500;
-                color: #4A3A2C;
+                color: #4a3a2c;
                 letter-spacing: 0.1em;
                 margin-bottom: 0.4rem;
             }
 
             .lock-sub {
                 font-size: 0.88rem;
-                color: #A6927B;
+                color: #a6927b;
                 font-weight: 400;
                 letter-spacing: 0.05em;
                 margin-bottom: 1.6rem;
@@ -96,8 +94,8 @@
                 padding: 0.8rem 1rem;
                 border: 1px solid rgba(139, 115, 85, 0.18);
                 border-radius: 12px;
-                background: #FBFAF6;
-                color: #4A3A2C;
+                background: #fbfaf6;
+                color: #4a3a2c;
                 font-size: 0.95rem;
                 outline: none;
                 text-align: center;
@@ -109,20 +107,20 @@
 
             .lock-input:focus {
                 border-color: rgba(139, 115, 85, 0.45);
-                background: #FFFCF7;
+                background: #fffcf7;
                 box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.05);
             }
 
             .lock-input::placeholder {
-                color: #C4B6A6;
+                color: #c4b6a6;
                 letter-spacing: 0.05em;
             }
 
             .lock-btn {
                 width: 100%;
                 padding: 0.8rem;
-                background: #8B7355;
-                color: #FFFCF7;
+                background: #8b7355;
+                color: #fffcf7;
                 border: none;
                 border-radius: 12px;
                 font-size: 0.95rem;
@@ -134,7 +132,7 @@
             }
 
             .lock-btn:hover {
-                background: #7A6247;
+                background: #7a6247;
                 transform: translateY(-1px);
                 box-shadow: 0 6px 24px rgba(139, 115, 85, 0.22);
             }
@@ -145,7 +143,7 @@
 
             .lock-error {
                 font-size: 0.8rem;
-                color: #B55A5A;
+                color: #b55a5a;
                 margin-top: 0.8rem;
                 min-height: 1.2em;
                 letter-spacing: 0.03em;
@@ -327,6 +325,81 @@
             .insight-wrap {
                 margin-top: 0.8rem;
                 display: none;
+            }
+
+            .book-fields {
+                display: none;
+                margin-bottom: 0.9rem;
+            }
+
+            .book-field-row {
+                display: flex;
+                gap: 0.6rem;
+                align-items: center;
+            }
+
+            .book-field-label {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-bottom: 0.35rem;
+            }
+
+            .book-input {
+                flex: 1;
+                padding: 0.45rem 0.7rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 8px;
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.85rem;
+                outline: none;
+                font-family: inherit;
+                transition: border-color 0.2s;
+            }
+
+            .book-input:focus {
+                border-color: var(--accent);
+            }
+
+            .book-status-select {
+                padding: 0.45rem 0.7rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 8px;
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.85rem;
+                outline: none;
+                font-family: inherit;
+                cursor: pointer;
+                transition: border-color 0.2s;
+            }
+
+            .book-status-select:focus {
+                border-color: var(--accent);
+            }
+
+            .book-status-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.2rem;
+                font-size: 0.78rem;
+                padding: 0.18rem 0.55rem;
+                border-radius: 10px;
+                font-weight: 500;
+            }
+
+            .note-book {
+                margin-top: 0.6rem;
+                font-size: 0.84rem;
+                color: var(--text);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .note-book-name {
+                font-weight: 500;
             }
 
             .insight-label {
@@ -621,11 +694,11 @@
             <div class="lock-card">
                 <div class="lock-botanical">
                     <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22 4V40" stroke="#8B7355" stroke-width="1" stroke-linecap="round"/>
-                        <path d="M22 16C26 12 32 10 36 12" stroke="#8B7355" stroke-width="0.9" stroke-linecap="round"/>
-                        <path d="M22 22C18 18 12 16 8 18" stroke="#8B7355" stroke-width="0.9" stroke-linecap="round"/>
-                        <path d="M22 28C26 24 30 22 34 24" stroke="#8B7355" stroke-width="0.8" stroke-linecap="round"/>
-                        <path d="M22 10C20 6 16 2 12 4" stroke="#8B7355" stroke-width="0.7" stroke-linecap="round"/>
+                        <path d="M22 4V40" stroke="#8B7355" stroke-width="1" stroke-linecap="round" />
+                        <path d="M22 16C26 12 32 10 36 12" stroke="#8B7355" stroke-width="0.9" stroke-linecap="round" />
+                        <path d="M22 22C18 18 12 16 8 18" stroke="#8B7355" stroke-width="0.9" stroke-linecap="round" />
+                        <path d="M22 28C26 24 30 22 34 24" stroke="#8B7355" stroke-width="0.8" stroke-linecap="round" />
+                        <path d="M22 10C20 6 16 2 12 4" stroke="#8B7355" stroke-width="0.7" stroke-linecap="round" />
                     </svg>
                 </div>
                 <h1 class="lock-title">拾光</h1>
@@ -673,11 +746,23 @@
                     <button class="tab" data-type="摘录" onclick="setTab(this)">🤔 摘录</button>
                     <button class="tab" data-type="目标" onclick="setTab(this)">🎯 目标</button>
                     <button class="tab" data-type="开心" onclick="setTab(this)">🌸 开心</button>
+                    <button class="tab" data-type="书单" onclick="setTab(this)">📚 书单</button>
                 </div>
 
                 <!-- 写作区 -->
                 <div class="write-card">
                     <div class="write-type-label" id="write-label">💡 记录一个灵感</div>
+                    <div class="book-fields" id="book-fields">
+                        <!-- <div class="book-field-label">📚 书名</div> -->
+                        <div class="book-field-row">
+                            <input class="book-input" id="write-book-name" type="text" placeholder="输入书名…" />
+                            <select class="book-status-select" id="write-book-status">
+                                <option value="想读">想读</option>
+                                <option value="在读">在读</option>
+                                <option value="读完">读完</option>
+                            </select>
+                        </div>
+                    </div>
                     <textarea class="write-textarea" id="write-content" placeholder="今天有什么想说的……"></textarea>
                     <div class="insight-wrap" id="insight-wrap">
                         <div class="insight-label">✍️ 我的感悟</div>
@@ -707,6 +792,7 @@
                         <button class="filter-btn" data-filter="摘录" onclick="setFilter(this)">🤔</button>
                         <button class="filter-btn" data-filter="目标" onclick="setFilter(this)">🎯</button>
                         <button class="filter-btn" data-filter="开心" onclick="setFilter(this)">🌸</button>
+                        <button class="filter-btn" data-filter="书单" onclick="setFilter(this)">📚</button>
                     </div>
                 </div>
 
@@ -733,6 +819,13 @@
                 摘录: {emoji: "🤔", hint: "摘录一段值得回味的文字"},
                 目标: {emoji: "🎯", hint: "写下你的目标"},
                 开心: {emoji: "🌸", hint: "记录一个开心时刻"},
+                书单: {emoji: "📚", hint: "加入一本想读的书"},
+            };
+
+            const BOOK_STATUS = {
+                想读: {emoji: "🌱", color: "#8B7355"},
+                在读: {emoji: "📖", color: "#5C7A9E"},
+                读完: {emoji: "✅", color: "#6B8E5A"},
             };
 
             let currentType = "灵感";
@@ -791,6 +884,7 @@
                 document.getElementById("write-label").textContent = info.emoji + " " + info.hint;
                 document.getElementById("write-content").placeholder = "今天有什么想说的……";
                 document.getElementById("insight-wrap").style.display = currentType === "摘录" ? "block" : "none";
+                document.getElementById("book-fields").style.display = currentType === "书单" ? "block" : "none";
             }
 
             function setFilter(btn) {
@@ -910,6 +1004,8 @@
                         type: getText("类型") || getText("Type"),
                         content: getText("内容") || getText("Content"),
                         insight: getText("感悟") || getText("Insight"),
+                        bookName: getText("书名") || getText("Book"),
+                        bookStatus: getText("状态") || getText("Status"),
                         date: page.created_time ? page.created_time.slice(0, 10) : "",
                     };
                 });
@@ -924,7 +1020,9 @@
                     const q = currentSearch.toLowerCase();
                     filtered = filtered.filter(
                         (n) =>
-                            (n.content || "").toLowerCase().includes(q) || (n.insight || "").toLowerCase().includes(q)
+                            (n.content || "").toLowerCase().includes(q) ||
+                            (n.insight || "").toLowerCase().includes(q) ||
+                            (n.bookName || "").toLowerCase().includes(q)
                     );
                 }
 
@@ -945,6 +1043,22 @@
                           n.insight
                       )}</div>`
                     : "";
+
+                let bookHTML = "";
+                if (n.type === "书单" && (n.bookName || n.bookStatus)) {
+                    const st = BOOK_STATUS[n.bookStatus] || {};
+                    bookHTML = `<div class="note-book">
+                        ${n.bookName ? `<span class="note-book-name">📚 ${escHtml(n.bookName)}</span>` : ""}
+                        ${
+                            n.bookStatus
+                                ? `<span class="book-status-tag" style="background:${st.color || "#8B7355"}18;color:${
+                                      st.color || "#8B7355"
+                                  }">${st.emoji || ""} ${n.bookStatus}</span>`
+                                : ""
+                        }
+                    </div>`;
+                }
+
                 return `
       <div class="note-card" data-id="${n.id}">
         <button class="note-delete" onclick="deleteNote('${n.id}', this)" title="删除">✕</button>
@@ -953,6 +1067,7 @@
           <span class="note-date">${n.date}</span>
         </div>
         <div class="note-content">${escHtml(n.content)}</div>
+        ${bookHTML}
         ${insightHTML}
       </div>`;
             }
@@ -967,6 +1082,8 @@
                 const db = document.getElementById("notion-db").value.trim();
                 const content = document.getElementById("write-content").value.trim();
                 const insight = document.getElementById("write-insight").value.trim();
+                const bookName = document.getElementById("write-book-name").value.trim();
+                const bookStatus = document.getElementById("write-book-status").value;
                 const btn = document.getElementById("save-btn");
                 const statusEl = document.getElementById("save-status");
 
@@ -994,6 +1111,11 @@
                     props["感悟"] = {rich_text: [{text: {content: insight}}]};
                 }
 
+                if (currentType === "书单") {
+                    if (bookName) props["书名"] = {rich_text: [{text: {content: bookName}}]};
+                    props["状态"] = {select: {name: bookStatus}};
+                }
+
                 try {
                     const res = await fetch("https://shiguang-proxy.hazel3248627535.workers.dev/v1/pages", {
                         method: "POST",
@@ -1008,6 +1130,8 @@
                             type: currentType,
                             content,
                             insight: currentType === "摘录" ? insight : "",
+                            bookName: currentType === "书单" ? bookName : "",
+                            bookStatus: currentType === "书单" ? bookStatus : "",
                             date: new Date().toISOString().slice(0, 10),
                         };
                         allNotes.unshift(newNote);
@@ -1015,6 +1139,8 @@
 
                         document.getElementById("write-content").value = "";
                         document.getElementById("write-insight").value = "";
+                        document.getElementById("write-book-name").value = "";
+                        document.getElementById("write-book-status").value = "想读";
                         statusEl.textContent = "✓ 已保存到 Notion";
                         statusEl.className = "save-status ok";
                         setTimeout(() => (statusEl.textContent = ""), 3000);
