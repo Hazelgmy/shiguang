@@ -716,8 +716,13 @@
                 transition: opacity 0.2s;
             }
 
-            .card-edit-save:hover { opacity: 0.85; }
-            .card-edit-save:disabled { opacity: 0.5; cursor: not-allowed; }
+            .card-edit-save:hover {
+                opacity: 0.85;
+            }
+            .card-edit-save:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
 
             .card-edit-cancel {
                 min-width: 44px;
@@ -841,7 +846,7 @@
         <div id="app">
             <!-- 顶部标题栏 -->
             <header class="header">
-                <span class="header-title">🌿 我的手账</span>
+                <span class="header-title">🌿 拾光</span>
                 <div class="header-actions">
                     <button class="lock-exit" onclick="lockApp()">🔒 锁定</button>
                 </div>
@@ -1088,7 +1093,7 @@
                     results = results.concat(data.results || []);
                     cursor = data.has_more ? data.next_cursor : undefined;
                 } while (cursor);
-                return { results };
+                return {results};
             }
 
             async function loadNotes() {
@@ -1197,7 +1202,12 @@
             }
 
             function escHtml(s) {
-                return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+                return (s || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
             }
 
             // ===== 卡片编辑 =====
@@ -1269,27 +1279,30 @@
 
                 const saveBtn = document.getElementById("edit-save-" + id);
                 const errEl = document.getElementById("edit-err-" + id);
-                if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "…"; }
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = "…";
+                }
                 if (errEl) errEl.textContent = "";
 
-                const props = { "内容": { title: [{ text: { content } }] } };
+                const props = {内容: {title: [{text: {content}}]}};
 
                 if (note.type === "摘录") {
                     const el = document.getElementById("edit-insight-" + id);
-                    props["感悟"] = { rich_text: [{ text: { content: el ? el.value.trim() : "" } }] };
+                    props["感悟"] = {rich_text: [{text: {content: el ? el.value.trim() : ""}}]};
                 }
                 if (note.type === "书单") {
                     const nEl = document.getElementById("edit-book-" + id);
                     const sEl = document.getElementById("edit-status-" + id);
-                    props["书名"] = { rich_text: [{ text: { content: nEl ? nEl.value.trim() : "" } }] };
-                    props["状态"] = { select: { name: sEl ? sEl.value : "想读" } };
+                    props["书名"] = {rich_text: [{text: {content: nEl ? nEl.value.trim() : ""}}]};
+                    props["状态"] = {select: {name: sEl ? sEl.value : "想读"}};
                 }
 
                 try {
                     const res = await fetch("https://shiguang-proxy.hazel3248627535.workers.dev/v1/pages/" + id, {
                         method: "PATCH",
                         headers: getHeaders(),
-                        body: JSON.stringify({ properties: props }),
+                        body: JSON.stringify({properties: props}),
                     });
                     if (res.ok) {
                         note.content = content;
@@ -1310,11 +1323,17 @@
                         }
                     } else {
                         const err = await res.json();
-                        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "保存"; }
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = "保存";
+                        }
                         if (errEl) errEl.textContent = "✗ 保存失败：" + (err.message || res.status);
                     }
                 } catch (e) {
-                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "保存"; }
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "保存";
+                    }
                     if (errEl) errEl.textContent = "✗ 网络错误";
                 }
             }
