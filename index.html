@@ -426,6 +426,13 @@
             }
 
             /* ===== 图片上传相关 ===== */
+            .paste-hint {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                opacity: 0.65;
+                white-space: nowrap;
+            }
+
             .img-upload-btn {
                 display: inline-flex;
                 align-items: center;
@@ -1088,6 +1095,7 @@
                         <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">
                             📷 添加图片
                         </button>
+                        <span class="paste-hint">📋 支持粘贴</span>
                         <span class="save-status" id="save-status"></span>
                         <button class="save-btn" id="save-btn" onclick="saveNote()">保存 ✦</button>
                     </div>
@@ -1466,6 +1474,40 @@
                 e.target.value = "";
             }
 
+            function extractImagesFromPaste(e) {
+                const items = e.clipboardData && e.clipboardData.items;
+                if (!items) return [];
+                const files = [];
+                for (const item of items) {
+                    if (item.type.startsWith("image/")) {
+                        const file = item.getAsFile();
+                        if (file) files.push(file);
+                    }
+                }
+                return files;
+            }
+
+            document.addEventListener("paste", (e) => {
+                const target = e.target;
+                if (target.id === "write-content") {
+                    const files = extractImagesFromPaste(e);
+                    if (files.length) {
+                        e.preventDefault();
+                        selectedFiles = selectedFiles.concat(files);
+                        renderImagePreviews();
+                    }
+                } else if (target.id && target.id.startsWith("edit-content-")) {
+                    const files = extractImagesFromPaste(e);
+                    if (files.length) {
+                        e.preventDefault();
+                        const noteId = target.id.replace("edit-content-", "");
+                        if (!editNewFiles[noteId]) editNewFiles[noteId] = [];
+                        editNewFiles[noteId] = editNewFiles[noteId].concat(files);
+                        renderEditImages(noteId);
+                    }
+                }
+            });
+
             function removeSelectedFile(index) {
                 selectedFiles.splice(index, 1);
                 renderImagePreviews();
@@ -1765,6 +1807,7 @@
                 <div class="img-preview-wrap" id="edit-img-area-${n.id}"></div>
                 <input type="file" id="edit-img-input-${n.id}" accept="image/*" multiple style="display:none" onchange="handleEditFileSelect('${n.id}', event)" />
                 <button class="img-upload-btn" onclick="document.getElementById('edit-img-input-${n.id}').click()" style="margin-top:0.4rem">📷 添加图片</button>
+                <span class="paste-hint">📋 支持粘贴</span>
               </div>
               <div class="card-edit-actions">
                 <span class="card-inline-err" id="edit-err-${n.id}"></span>
