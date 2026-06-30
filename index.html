@@ -409,6 +409,159 @@
                 margin-bottom: 0.4rem;
             }
 
+            /* ===== 图片上传相关 ===== */
+            .img-upload-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.45rem 0.9rem;
+                background: transparent;
+                border: 1px solid var(--border-mid);
+                border-radius: 8px;
+                color: var(--text-muted);
+                font-size: 0.82rem;
+                cursor: pointer;
+                font-family: inherit;
+                transition: all 0.2s;
+            }
+
+            .img-upload-btn:hover {
+                background: var(--card2);
+                color: var(--text);
+            }
+
+            .img-preview-wrap {
+                display: none;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.8rem;
+            }
+
+            .img-preview-item {
+                position: relative;
+                width: 60px;
+                height: 60px;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid var(--border-mid);
+                background: var(--card2);
+            }
+
+            .img-preview-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .img-preview-del {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: rgba(92, 78, 56, 0.75);
+                color: #f7f3ee;
+                border: none;
+                cursor: pointer;
+                font-size: 0.7rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                padding: 0;
+                transition: background 0.15s;
+            }
+
+            .img-preview-del:hover {
+                background: rgba(92, 78, 56, 0.95);
+            }
+
+            /* ===== 编辑模式图片"新"角标 ===== */
+            .edit-img-new-badge {
+                position: absolute;
+                top: -1px;
+                left: -1px;
+                background: var(--accent);
+                color: #f7f3ee;
+                font-size: 0.58rem;
+                padding: 1px 5px;
+                border-radius: 5px;
+                font-weight: 500;
+                line-height: 1.5;
+                pointer-events: none;
+            }
+
+            /* ===== 编辑模式图片区域 ===== */
+            .edit-img-section {
+                margin-top: 0.6rem;
+                padding-top: 0.6rem;
+                border-top: 1px dashed var(--border-mid);
+            }
+
+            .edit-img-label {
+                font-size: 0.78rem;
+                color: var(--text-muted);
+                margin-bottom: 0.35rem;
+            }
+
+            /* ===== 笔记卡片内图片 ===== */
+            .note-images {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.4rem;
+                margin-top: 0.7rem;
+            }
+
+            .note-image-thumb {
+                width: 70px;
+                height: 70px;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid var(--border);
+                cursor: pointer;
+                background: var(--card2);
+                transition: opacity 0.2s;
+            }
+
+            .note-image-thumb:hover {
+                opacity: 0.8;
+            }
+
+            .note-image-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            /* ===== 图片全屏遮罩 ===== */
+            .img-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(36, 28, 18, 0.78);
+                z-index: 9997;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                animation: overlayFadeIn 0.2s ease;
+            }
+
+            @keyframes overlayFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            .img-overlay-img {
+                max-width: 92vw;
+                max-height: 92vh;
+                object-fit: contain;
+                border-radius: 10px;
+                box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+            }
+
             .write-actions {
                 display: flex;
                 justify-content: flex-end;
@@ -878,7 +1031,6 @@
                 <div class="write-card">
                     <div class="write-type-label" id="write-label">💡 记录一个灵感</div>
                     <div class="book-fields" id="book-fields">
-                        <!-- <div class="book-field-label">📚 书名</div> -->
                         <div class="book-field-row">
                             <input class="book-input" id="write-book-name" type="text" placeholder="输入书名…" />
                             <select class="book-status-select" id="write-book-status">
@@ -898,7 +1050,17 @@
                             style="min-height: 70px"
                         ></textarea>
                     </div>
+                    <input
+                        type="file"
+                        id="img-file-input"
+                        accept="image/*"
+                        multiple
+                        style="display:none"
+                        onchange="handleFileSelect(event)"
+                    />
+                    <div class="img-preview-wrap" id="img-preview-wrap"></div>
                     <div class="write-actions">
+                        <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">📷 添加图片</button>
                         <span class="save-status" id="save-status"></span>
                         <button class="save-btn" id="save-btn" onclick="saveNote()">保存 ✦</button>
                     </div>
@@ -932,6 +1094,11 @@
             </div>
         </div>
 
+        <!-- ===== 图片全屏遮罩 ===== -->
+        <div id="img-overlay" class="img-overlay" style="display:none" onclick="hideImageOverlay()">
+            <img id="img-overlay-img" class="img-overlay-img" src="" alt="" />
+        </div>
+
         <script>
             // ===== 密码（可改）=====
             const CORRECT_PWD = "1234";
@@ -957,6 +1124,11 @@
             let currentFilter = "全部";
             let currentSearch = "";
             let allNotes = [];
+            let selectedFiles = [];
+
+            // 编辑模式下的图片状态（按 noteId 索引）
+            let editKeptImages = {};
+            let editNewFiles = {};
 
             // ===== 密码锁 =====
             document.getElementById("pwd-input").addEventListener("keydown", (e) => {
@@ -1125,6 +1297,18 @@
                         if (p.select) return p.select?.name || "";
                         return "";
                     };
+
+                    let images = [];
+                    const imgProp = props["图片"];
+                    if (imgProp && imgProp.type === "files" && Array.isArray(imgProp.files)) {
+                        images = imgProp.files
+                            .map((f) => ({
+                                url: (f.external && f.external.url) || (f.file && f.file.url) || "",
+                                name: f.name || "",
+                            }))
+                            .filter((img) => img.url);
+                    }
+
                     return {
                         id: page.id,
                         type: getText("类型") || getText("Type"),
@@ -1133,6 +1317,7 @@
                         bookName: getText("书名") || getText("Book"),
                         bookStatus: getText("状态") || getText("Status"),
                         date: page.created_time ? page.created_time.slice(0, 10) : "",
+                        images,
                     };
                 });
             }
@@ -1185,20 +1370,36 @@
                     </div>`;
                 }
 
+                let imagesHTML = "";
+                if (n.images && n.images.length) {
+                    imagesHTML =
+                        `<div class="note-images">` +
+                        n.images
+                            .map(
+                                (img) =>
+                                    `<div class="note-image-thumb" onclick="event.stopPropagation();showImageOverlay('${escAttr(
+                                        img.url
+                                    )}')"><img src="${escAttr(img.url)}" alt="${escAttr(img.name || "")}" loading="lazy" /></div>`
+                            )
+                            .join("") +
+                        `</div>`;
+                }
+
                 return `
-      <div class="note-card" data-id="${n.id}">
-        <div class="note-card-top">
-          <span class="note-type-badge">${info.emoji} ${n.type}</span>
-          <div class="note-card-actions">
-            <button class="card-act-btn card-edit-btn" onclick="startEdit('${n.id}')" title="编辑">✎</button>
-            <button class="card-act-btn card-del-btn" onclick="deleteNote('${n.id}', this)" title="删除">✕</button>
-            <span class="note-date">${n.date}</span>
-          </div>
-        </div>
-        <div class="note-content">${escHtml(n.content)}</div>
-        ${bookHTML}
-        ${insightHTML}
-      </div>`;
+          <div class="note-card" data-id="${n.id}">
+            <div class="note-card-top">
+              <span class="note-type-badge">${info.emoji} ${n.type}</span>
+              <div class="note-card-actions">
+                <button class="card-act-btn card-edit-btn" onclick="startEdit('${n.id}')" title="编辑">✎</button>
+                <button class="card-act-btn card-del-btn" onclick="deleteNote('${n.id}', this)" title="删除">✕</button>
+                <span class="note-date">${n.date}</span>
+              </div>
+            </div>
+            <div class="note-content">${escHtml(n.content)}</div>
+            ${bookHTML}
+            ${imagesHTML}
+            ${insightHTML}
+          </div>`;
             }
 
             function escHtml(s) {
@@ -1210,132 +1411,76 @@
                 .replace(/'/g, "&#39;");
             }
 
-            // ===== 卡片编辑 =====
-            function editCardHTML(n) {
-                const info = TYPE_MAP[n.type] || {emoji: "📝"};
-                let extra = "";
-                if (n.type === "书单") {
-                    extra = `
-                <div class="card-edit-label">📚 书名</div>
-                <input class="card-edit-input" id="edit-book-${n.id}" placeholder="书名…" />
-                <div class="card-edit-label">状态</div>
-                <select class="card-edit-select" id="edit-status-${n.id}">
-                  <option value="想读">想读</option>
-                  <option value="在读">在读</option>
-                  <option value="读完">读完</option>
-                </select>`;
-                } else if (n.type === "摘录") {
-                    extra = `
-                <div class="card-edit-label">✍️ 我的感悟</div>
-                <textarea class="card-edit-textarea" id="edit-insight-${n.id}" style="min-height:60px"></textarea>`;
-                }
-                return `
-          <div class="note-card-top">
-            <span class="note-type-badge">${info.emoji} ${n.type}</span>
-            <span class="note-date">${n.date}</span>
-          </div>
-          <textarea class="card-edit-textarea" id="edit-content-${n.id}"></textarea>
-          ${extra}
-          <div class="card-edit-actions">
-            <span class="card-inline-err" id="edit-err-${n.id}"></span>
-            <button class="card-edit-cancel" onclick="cancelEdit('${n.id}')">取消</button>
-            <button class="card-edit-save" id="edit-save-${n.id}" onclick="saveEdit('${n.id}')">保存</button>
-          </div>`;
+            function escAttr(s) {
+                return (s || "")
+                .replace(/&/g, "&amp;")
+                .replace(/"/g, "&quot;");
             }
 
-            function startEdit(id) {
-                const note = allNotes.find((n) => n.id === id);
-                if (!note) return;
-                const card = document.querySelector(`.note-card[data-id="${id}"]`);
-                if (!card) return;
-                card.setAttribute("data-editing", "1");
-                card.innerHTML = editCardHTML(note);
-                document.getElementById("edit-content-" + id).value = note.content;
-                if (note.type === "书单") {
-                    document.getElementById("edit-book-" + id).value = note.bookName || "";
-                    document.getElementById("edit-status-" + id).value = note.bookStatus || "想读";
-                }
-                if (note.type === "摘录") {
-                    document.getElementById("edit-insight-" + id).value = note.insight || "";
-                }
-                const ta = card.querySelector("textarea");
-                if (ta) ta.focus();
+            // ===== 图片选择与预览（写作区）=====
+            function handleFileSelect(e) {
+                const files = Array.from(e.target.files);
+                selectedFiles = selectedFiles.concat(files);
+                renderImagePreviews();
+                e.target.value = "";
             }
 
-            function cancelEdit(id) {
-                const note = allNotes.find((n) => n.id === id);
-                if (!note) return;
-                const card = document.querySelector(`.note-card[data-id="${id}"]`);
-                if (!card) return;
-                card.removeAttribute("data-editing");
-                card.outerHTML = noteCardHTML(note);
+            function removeSelectedFile(index) {
+                selectedFiles.splice(index, 1);
+                renderImagePreviews();
             }
 
-            async function saveEdit(id) {
-                const note = allNotes.find((n) => n.id === id);
-                if (!note) return;
-                const content = document.getElementById("edit-content-" + id).value.trim();
-                if (!content) return;
+            function renderImagePreviews() {
+                const wrap = document.getElementById("img-preview-wrap");
+                wrap.querySelectorAll("img").forEach((img) => {
+                    if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+                });
 
-                const saveBtn = document.getElementById("edit-save-" + id);
-                const errEl = document.getElementById("edit-err-" + id);
-                if (saveBtn) {
-                    saveBtn.disabled = true;
-                    saveBtn.textContent = "…";
-                }
-                if (errEl) errEl.textContent = "";
-
-                const props = {内容: {title: [{text: {content}}]}};
-
-                if (note.type === "摘录") {
-                    const el = document.getElementById("edit-insight-" + id);
-                    props["感悟"] = {rich_text: [{text: {content: el ? el.value.trim() : ""}}]};
-                }
-                if (note.type === "书单") {
-                    const nEl = document.getElementById("edit-book-" + id);
-                    const sEl = document.getElementById("edit-status-" + id);
-                    props["书名"] = {rich_text: [{text: {content: nEl ? nEl.value.trim() : ""}}]};
-                    props["状态"] = {select: {name: sEl ? sEl.value : "想读"}};
+                if (!selectedFiles.length) {
+                    wrap.innerHTML = "";
+                    wrap.style.display = "none";
+                    return;
                 }
 
-                try {
-                    const res = await fetch("https://shiguang-proxy.hazel3248627535.workers.dev/v1/pages/" + id, {
-                        method: "PATCH",
-                        headers: getHeaders(),
-                        body: JSON.stringify({properties: props}),
-                    });
-                    if (res.ok) {
-                        note.content = content;
-                        if (note.type === "摘录") {
-                            const el = document.getElementById("edit-insight-" + id);
-                            note.insight = el ? el.value.trim() : "";
-                        }
-                        if (note.type === "书单") {
-                            const nEl = document.getElementById("edit-book-" + id);
-                            const sEl = document.getElementById("edit-status-" + id);
-                            note.bookName = nEl ? nEl.value.trim() : "";
-                            note.bookStatus = sEl ? sEl.value : "想读";
-                        }
-                        const card = document.querySelector(`.note-card[data-id="${id}"]`);
-                        if (card) {
-                            card.removeAttribute("data-editing");
-                            card.outerHTML = noteCardHTML(note);
-                        }
-                    } else {
-                        const err = await res.json();
-                        if (saveBtn) {
-                            saveBtn.disabled = false;
-                            saveBtn.textContent = "保存";
-                        }
-                        if (errEl) errEl.textContent = "✗ 保存失败：" + (err.message || res.status);
-                    }
-                } catch (e) {
-                    if (saveBtn) {
-                        saveBtn.disabled = false;
-                        saveBtn.textContent = "保存";
-                    }
-                    if (errEl) errEl.textContent = "✗ 网络错误";
+                wrap.style.display = "flex";
+                wrap.innerHTML = selectedFiles
+                    .map((file, i) => {
+                        const url = URL.createObjectURL(file);
+                        return `<div class="img-preview-item">
+                    <img src="${url}" alt="${escAttr(file.name)}" />
+                    <button class="img-preview-del" onclick="event.stopPropagation();removeSelectedFile(${i})" title="移除">&#xd7;</button>
+                  </div>`;
+                    })
+                    .join("");
+            }
+
+            function clearImagePreviews() {
+                const wrap = document.getElementById("img-preview-wrap");
+                wrap.querySelectorAll("img").forEach((img) => {
+                    if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+                });
+                wrap.innerHTML = "";
+                wrap.style.display = "none";
+                selectedFiles = [];
+            }
+
+            // ===== Cloudinary 上传 =====
+            async function uploadToCloudinary(file) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "shiguang_unsigned");
+
+                const res = await fetch("https://api.cloudinary.com/v1_1/dxubop09c/image/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!res.ok) {
+                    throw new Error("图片上传失败 (HTTP " + res.status + ")");
                 }
+
+                const data = await res.json();
+                return { url: data.secure_url, name: file.name };
             }
 
             // ===== 保存笔记 =====
@@ -1361,8 +1506,26 @@
                 }
 
                 btn.disabled = true;
-                btn.textContent = "保存中…";
                 statusEl.textContent = "";
+
+                let uploadedImages = [];
+
+                if (selectedFiles.length) {
+                    btn.textContent = "上传图片中…";
+                    try {
+                        uploadedImages = await Promise.all(
+                            selectedFiles.map((f) => uploadToCloudinary(f))
+                        );
+                    } catch (e) {
+                        statusEl.textContent = "✗ " + e.message;
+                        statusEl.className = "save-status err";
+                        btn.disabled = false;
+                        btn.textContent = "保存 ✦";
+                        return;
+                    }
+                }
+
+                btn.textContent = "保存中…";
 
                 const props = {
                     内容: {title: [{text: {content}}]},
@@ -1376,6 +1539,15 @@
                 if (currentType === "书单") {
                     if (bookName) props["书名"] = {rich_text: [{text: {content: bookName}}]};
                     props["状态"] = {select: {name: bookStatus}};
+                }
+
+                if (uploadedImages.length) {
+                    props["图片"] = {
+                        files: uploadedImages.map((img) => ({
+                            name: img.name,
+                            external: {url: img.url},
+                        })),
+                    };
                 }
 
                 try {
@@ -1395,6 +1567,7 @@
                             bookName: currentType === "书单" ? bookName : "",
                             bookStatus: currentType === "书单" ? bookStatus : "",
                             date: new Date().toISOString().slice(0, 10),
+                            images: uploadedImages,
                         };
                         allNotes.unshift(newNote);
                         renderCards();
@@ -1403,6 +1576,7 @@
                         document.getElementById("write-insight").value = "";
                         document.getElementById("write-book-name").value = "";
                         document.getElementById("write-book-status").value = "想读";
+                        clearImagePreviews();
                         statusEl.textContent = "✓ 已保存到 Notion";
                         statusEl.className = "save-status ok";
                         setTimeout(() => (statusEl.textContent = ""), 3000);
@@ -1418,6 +1592,276 @@
 
                 btn.disabled = false;
                 btn.textContent = "保存 ✦";
+            }
+
+            // ===== 图片全屏查看 =====
+            function showImageOverlay(url) {
+                const overlay = document.getElementById("img-overlay");
+                const img = document.getElementById("img-overlay-img");
+                img.src = url;
+                overlay.style.display = "flex";
+                document.body.style.overflow = "hidden";
+            }
+
+            function hideImageOverlay() {
+                const overlay = document.getElementById("img-overlay");
+                overlay.style.display = "none";
+                document.body.style.overflow = "";
+            }
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") hideImageOverlay();
+            });
+
+            // ===== 编辑模式图片管理 =====
+            function renderEditImages(noteId) {
+                const area = document.getElementById("edit-img-area-" + noteId);
+                if (!area) return;
+
+                area.querySelectorAll("img").forEach((img) => {
+                    if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+                });
+
+                const kept = editKeptImages[noteId] || [];
+                const newFiles = editNewFiles[noteId] || [];
+
+                if (!kept.length && !newFiles.length) {
+                    area.innerHTML = "";
+                    area.style.display = "none";
+                    return;
+                }
+
+                area.style.display = "flex";
+
+                let html = "";
+
+                kept.forEach((img, i) => {
+                    html += `<div class="img-preview-item">
+                <img src="${escAttr(img.url)}" alt="${escAttr(img.name || "")}" />
+                <button class="img-preview-del" onclick="event.stopPropagation();removeEditKeptImage('${noteId}', ${i})" title="移除">&#xd7;</button>
+              </div>`;
+                });
+
+                newFiles.forEach((file, i) => {
+                    const blobUrl = URL.createObjectURL(file);
+                    html += `<div class="img-preview-item">
+                <img src="${blobUrl}" alt="${escAttr(file.name)}" />
+                <span class="edit-img-new-badge">新</span>
+                <button class="img-preview-del" onclick="event.stopPropagation();removeEditNewFile('${noteId}', ${i})" title="移除">&#xd7;</button>
+              </div>`;
+                });
+
+                area.innerHTML = html;
+            }
+
+            function removeEditKeptImage(noteId, index) {
+                if (!editKeptImages[noteId]) return;
+                editKeptImages[noteId].splice(index, 1);
+                renderEditImages(noteId);
+            }
+
+            function removeEditNewFile(noteId, index) {
+                if (!editNewFiles[noteId]) return;
+                editNewFiles[noteId].splice(index, 1);
+                renderEditImages(noteId);
+            }
+
+            function handleEditFileSelect(noteId, e) {
+                const files = Array.from(e.target.files);
+                if (!editNewFiles[noteId]) editNewFiles[noteId] = [];
+                editNewFiles[noteId] = editNewFiles[noteId].concat(files);
+                renderEditImages(noteId);
+                e.target.value = "";
+            }
+
+            function cleanupEditImageState(noteId) {
+                const area = document.getElementById("edit-img-area-" + noteId);
+                if (area) {
+                    area.querySelectorAll("img").forEach((img) => {
+                        if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+                    });
+                }
+                delete editKeptImages[noteId];
+                delete editNewFiles[noteId];
+            }
+
+            // ===== 卡片编辑 =====
+            function editCardHTML(n) {
+                const info = TYPE_MAP[n.type] || {emoji: "📝"};
+                let extra = "";
+                if (n.type === "书单") {
+                    extra = `
+                    <div class="card-edit-label">📚 书名</div>
+                    <input class="card-edit-input" id="edit-book-${n.id}" placeholder="书名…" />
+                    <div class="card-edit-label">状态</div>
+                    <select class="card-edit-select" id="edit-status-${n.id}">
+                      <option value="想读">想读</option>
+                      <option value="在读">在读</option>
+                      <option value="读完">读完</option>
+                    </select>`;
+                } else if (n.type === "摘录") {
+                    extra = `
+                    <div class="card-edit-label">✍️ 我的感悟</div>
+                    <textarea class="card-edit-textarea" id="edit-insight-${n.id}" style="min-height:60px"></textarea>`;
+                }
+                return `
+              <div class="note-card-top">
+                <span class="note-type-badge">${info.emoji} ${n.type}</span>
+                <span class="note-date">${n.date}</span>
+              </div>
+              <textarea class="card-edit-textarea" id="edit-content-${n.id}"></textarea>
+              ${extra}
+              <div class="edit-img-section">
+                <div class="edit-img-label">📷 图片</div>
+                <div class="img-preview-wrap" id="edit-img-area-${n.id}"></div>
+                <input type="file" id="edit-img-input-${n.id}" accept="image/*" multiple style="display:none" onchange="handleEditFileSelect('${n.id}', event)" />
+                <button class="img-upload-btn" onclick="document.getElementById('edit-img-input-${n.id}').click()" style="margin-top:0.4rem">📷 添加图片</button>
+              </div>
+              <div class="card-edit-actions">
+                <span class="card-inline-err" id="edit-err-${n.id}"></span>
+                <button class="card-edit-cancel" onclick="cancelEdit('${n.id}')">取消</button>
+                <button class="card-edit-save" id="edit-save-${n.id}" onclick="saveEdit('${n.id}')">保存</button>
+              </div>`;
+            }
+
+            function startEdit(id) {
+                const note = allNotes.find((n) => n.id === id);
+                if (!note) return;
+                const card = document.querySelector(`.note-card[data-id="${id}"]`);
+                if (!card) return;
+
+                // 初始化编辑模式图片状态
+                editKeptImages[id] = (note.images || []).map((img) => ({ url: img.url, name: img.name }));
+                editNewFiles[id] = [];
+
+                card.setAttribute("data-editing", "1");
+                card.innerHTML = editCardHTML(note);
+                document.getElementById("edit-content-" + id).value = note.content;
+                if (note.type === "书单") {
+                    document.getElementById("edit-book-" + id).value = note.bookName || "";
+                    document.getElementById("edit-status-" + id).value = note.bookStatus || "想读";
+                }
+                if (note.type === "摘录") {
+                    document.getElementById("edit-insight-" + id).value = note.insight || "";
+                }
+
+                renderEditImages(id);
+
+                const ta = card.querySelector("textarea");
+                if (ta) ta.focus();
+            }
+
+            function cancelEdit(id) {
+                const note = allNotes.find((n) => n.id === id);
+                if (!note) return;
+                const card = document.querySelector(`.note-card[data-id="${id}"]`);
+                if (!card) return;
+
+                cleanupEditImageState(id);
+
+                card.removeAttribute("data-editing");
+                card.outerHTML = noteCardHTML(note);
+            }
+
+            async function saveEdit(id) {
+                const note = allNotes.find((n) => n.id === id);
+                if (!note) return;
+                const content = document.getElementById("edit-content-" + id).value.trim();
+                if (!content) return;
+
+                const saveBtn = document.getElementById("edit-save-" + id);
+                const errEl = document.getElementById("edit-err-" + id);
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = "…";
+                }
+                if (errEl) errEl.textContent = "";
+
+                // 上传新选择的图片
+                let newUploaded = [];
+                const newFiles = editNewFiles[id] || [];
+                if (newFiles.length) {
+                    saveBtn.textContent = "上传图片中…";
+                    try {
+                        newUploaded = await Promise.all(newFiles.map((f) => uploadToCloudinary(f)));
+                    } catch (e) {
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = "保存";
+                        }
+                        if (errEl) errEl.textContent = "✗ 图片上传失败：" + e.message;
+                        return;
+                    }
+                    saveBtn.textContent = "…";
+                }
+
+                // 合并保留的旧图 + 新上传的图
+                const keptImages = editKeptImages[id] || [];
+                const allImages = [...keptImages, ...newUploaded];
+
+                const props = {内容: {title: [{text: {content}}]}};
+
+                if (note.type === "摘录") {
+                    const el = document.getElementById("edit-insight-" + id);
+                    props["感悟"] = {rich_text: [{text: {content: el ? el.value.trim() : ""}}]};
+                }
+                if (note.type === "书单") {
+                    const nEl = document.getElementById("edit-book-" + id);
+                    const sEl = document.getElementById("edit-status-" + id);
+                    props["书名"] = {rich_text: [{text: {content: nEl ? nEl.value.trim() : ""}}]};
+                    props["状态"] = {select: {name: sEl ? sEl.value : "想读"}};
+                }
+
+                // 总是写入图片字段（即使为空也要清空）
+                props["图片"] = {
+                    files: allImages.map((img) => ({
+                        name: img.name,
+                        external: {url: img.url},
+                    })),
+                };
+
+                try {
+                    const res = await fetch("https://shiguang-proxy.hazel3248627535.workers.dev/v1/pages/" + id, {
+                        method: "PATCH",
+                        headers: getHeaders(),
+                        body: JSON.stringify({properties: props}),
+                    });
+                    if (res.ok) {
+                        note.content = content;
+                        note.images = allImages;
+                        if (note.type === "摘录") {
+                            const el = document.getElementById("edit-insight-" + id);
+                            note.insight = el ? el.value.trim() : "";
+                        }
+                        if (note.type === "书单") {
+                            const nEl = document.getElementById("edit-book-" + id);
+                            const sEl = document.getElementById("edit-status-" + id);
+                            note.bookName = nEl ? nEl.value.trim() : "";
+                            note.bookStatus = sEl ? sEl.value : "想读";
+                        }
+
+                        cleanupEditImageState(id);
+
+                        const card = document.querySelector(`.note-card[data-id="${id}"]`);
+                        if (card) {
+                            card.removeAttribute("data-editing");
+                            card.outerHTML = noteCardHTML(note);
+                        }
+                    } else {
+                        const err = await res.json();
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = "保存";
+                        }
+                        if (errEl) errEl.textContent = "✗ 保存失败：" + (err.message || res.status);
+                    }
+                } catch (e) {
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "保存";
+                    }
+                    if (errEl) errEl.textContent = "✗ 网络错误";
+                }
             }
 
             // ===== 删除笔记 =====
