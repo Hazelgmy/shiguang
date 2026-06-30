@@ -247,6 +247,37 @@
                 border-color: var(--accent);
             }
 
+            .config-toggle {
+                display: none;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border: 1px solid var(--border-mid);
+                border-radius: 7px;
+                background: transparent;
+                color: var(--text-muted);
+                cursor: pointer;
+                font-size: 0.9rem;
+                padding: 0;
+                transition: all 0.2s;
+                flex-shrink: 0;
+            }
+
+            .config-toggle:hover {
+                background: var(--card2);
+                color: var(--text);
+            }
+
+            .config-inputs-wrap {
+                display: flex;
+                gap: 0.8rem;
+                align-items: center;
+                flex-wrap: wrap;
+                flex: 1;
+                min-width: 0;
+            }
+
             .config-status {
                 font-size: 0.76rem;
                 color: var(--text-muted);
@@ -968,6 +999,19 @@
                     min-width: unset;
                     width: 100%;
                 }
+                .config-toggle {
+                    display: inline-flex;
+                }
+                .config-inputs-wrap {
+                    display: none;
+                    width: 100%;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0.5rem;
+                }
+                .config-inputs-wrap.open {
+                    display: flex;
+                }
                 .cards-grid {
                     grid-template-columns: 1fr;
                 }
@@ -1035,14 +1079,17 @@
 
             <!-- Notion + Cloudinary 配置 -->
             <div class="config-bar">
-                <span class="config-label">Notion Token</span>
-                <input class="config-input" type="password" id="notion-token" placeholder="secret_xxxxxxxx" />
-                <span class="config-label">Database ID</span>
-                <input class="config-input" id="notion-db" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-                <span class="config-label">Cloud Name</span>
-                <input class="config-input-narrow" id="cloudinary-cloud" placeholder="Cloud Name" />
-                <span class="config-label">Preset</span>
-                <input class="config-input-narrow" id="cloudinary-preset" placeholder="Preset" />
+                <button class="config-toggle" onclick="toggleConfig()" title="配置">⚙</button>
+                <div class="config-inputs-wrap" id="config-inputs-wrap">
+                    <span class="config-label">Notion Token</span>
+                    <input class="config-input" type="password" id="notion-token" placeholder="secret_xxxxxxxx" />
+                    <span class="config-label">Database ID</span>
+                    <input class="config-input" id="notion-db" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                    <span class="config-label">Cloud Name</span>
+                    <input class="config-input-narrow" id="cloudinary-cloud" placeholder="Cloud Name" />
+                    <span class="config-label">Preset</span>
+                    <input class="config-input-narrow" id="cloudinary-preset" placeholder="Preset" />
+                </div>
                 <span class="config-status" id="notion-status">未连接</span>
                 <button class="lock-exit" onclick="testNotion()">测试连接</button>
             </div>
@@ -1165,6 +1212,25 @@
             let editKeptImages = {};
             let editNewFiles = {};
 
+            // 图片懒加载观察器
+            const lazyImgObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            if (src) {
+                                img.src = src;
+                                img.removeAttribute("data-src");
+                                img.classList.remove("lazy-img");
+                            }
+                            lazyImgObserver.unobserve(img);
+                        }
+                    });
+                },
+                { rootMargin: "150px" }
+            );
+
             // ===== 密码锁 =====
             document.getElementById("pwd-input").addEventListener("keydown", (e) => {
                 if (e.key === "Enter") tryUnlock();
@@ -1212,6 +1278,11 @@
             document.getElementById("notion-db").addEventListener("input", saveConfig);
             document.getElementById("cloudinary-cloud").addEventListener("input", saveConfig);
             document.getElementById("cloudinary-preset").addEventListener("input", saveConfig);
+
+            function toggleConfig() {
+                const wrap = document.getElementById("config-inputs-wrap");
+                wrap.classList.toggle("open");
+            }
 
             // ===== Tab =====
             function setTab(btn) {
@@ -1386,6 +1457,10 @@
                 }
 
                 area.innerHTML = '<div class="cards-grid">' + filtered.map((n) => noteCardHTML(n)).join("") + "</div>";
+
+                requestAnimationFrame(() => {
+                    area.querySelectorAll(".lazy-img").forEach((img) => lazyImgObserver.observe(img));
+                });
             }
 
             function noteCardHTML(n) {
@@ -1420,9 +1495,9 @@
                             (img) =>
                                 `<div class="note-image-thumb" onclick="event.stopPropagation();showImageOverlay('${escAttr(
                                     img.url
-                                )}')"><img src="${escAttr(img.url)}" alt="${escAttr(
+                                )}')"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Crect fill='%23e8e0d3' width='70' height='70'/%3E%3C/svg%3E" data-src="${escAttr(img.url)}" alt="${escAttr(
                                     img.name || ""
-                                )}" loading="lazy" /></div>`
+                                )}" class="lazy-img" /></div>`
                         )
                         .join("") +
                         `</div>`;
@@ -1968,7 +2043,9 @@
 
             // ===== 删除笔记 =====
             async function deleteNote(id, btnEl) {
-                if (!confirm("确定删除这条记录吗？")) return;
+                const note = allNotes.find((n) => n.id === id);
+                const snippet = note ? (note.content || "(无内容)").slice(0, 40) + (note.content && note.content.length > 40 ? "…" : "") : "";
+                if (!confirm("确定删除这条记录吗？\n\n「" + snippet + "」")) return;
                 const token = document.getElementById("notion-token").value.trim();
                 if (!token) return;
 
