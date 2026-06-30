@@ -1428,7 +1428,7 @@
                         insight: getText("感悟") || getText("Insight"),
                         bookName: getText("书名") || getText("Book"),
                         bookStatus: getText("状态") || getText("Status"),
-                        date: page.created_time ? page.created_time.slice(0, 10) : "",
+                        date: page.created_time ? formatLocalTime(page.created_time) : "",
                         images,
                     };
                 });
@@ -1518,6 +1518,16 @@
             ${imagesHTML}
             ${insightHTML}
           </div>`;
+            }
+
+            function formatLocalTime(date) {
+                const d = new Date(date);
+                const y = d.getFullYear();
+                const mo = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const h = String(d.getHours()).padStart(2, '0');
+                const mi = String(d.getMinutes()).padStart(2, '0');
+                return `${y}-${mo}-${day} ${h}:${mi}`;
             }
 
             function escHtml(s) {
@@ -1732,7 +1742,7 @@
                             insight: currentType === "摘录" ? insight : "",
                             bookName: currentType === "书单" ? bookName : "",
                             bookStatus: currentType === "书单" ? bookStatus : "",
-                            date: new Date().toISOString().slice(0, 10),
+                            date: formatLocalTime(new Date()),
                             images: uploadedImages,
                         };
                         allNotes.unshift(newNote);
