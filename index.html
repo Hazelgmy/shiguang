@@ -231,6 +231,22 @@
                 border-color: var(--accent);
             }
 
+            .config-input-narrow {
+                flex: 0.6;
+                min-width: 110px;
+                padding: 0.4rem 0.7rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 7px;
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.82rem;
+                outline: none;
+            }
+
+            .config-input-narrow:focus {
+                border-color: var(--accent);
+            }
+
             .config-status {
                 font-size: 0.76rem;
                 color: var(--text-muted);
@@ -550,8 +566,12 @@
             }
 
             @keyframes overlayFadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
             }
 
             .img-overlay-img {
@@ -936,7 +956,8 @@
                     align-items: flex-start;
                     gap: 0.5rem;
                 }
-                .config-input {
+                .config-input,
+                .config-input-narrow {
                     min-width: unset;
                     width: 100%;
                 }
@@ -1005,12 +1026,16 @@
                 </div>
             </header>
 
-            <!-- Notion 配置 -->
+            <!-- Notion + Cloudinary 配置 -->
             <div class="config-bar">
                 <span class="config-label">Notion Token</span>
                 <input class="config-input" type="password" id="notion-token" placeholder="secret_xxxxxxxx" />
                 <span class="config-label">Database ID</span>
                 <input class="config-input" id="notion-db" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                <span class="config-label">Cloud Name</span>
+                <input class="config-input-narrow" id="cloudinary-cloud" placeholder="Cloud Name" />
+                <span class="config-label">Preset</span>
+                <input class="config-input-narrow" id="cloudinary-preset" placeholder="Preset" />
                 <span class="config-status" id="notion-status">未连接</span>
                 <button class="lock-exit" onclick="testNotion()">测试连接</button>
             </div>
@@ -1055,12 +1080,14 @@
                         id="img-file-input"
                         accept="image/*"
                         multiple
-                        style="display:none"
+                        style="display: none"
                         onchange="handleFileSelect(event)"
                     />
                     <div class="img-preview-wrap" id="img-preview-wrap"></div>
                     <div class="write-actions">
-                        <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">📷 添加图片</button>
+                        <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">
+                            📷 添加图片
+                        </button>
                         <span class="save-status" id="save-status"></span>
                         <button class="save-btn" id="save-btn" onclick="saveNote()">保存 ✦</button>
                     </div>
@@ -1095,7 +1122,7 @@
         </div>
 
         <!-- ===== 图片全屏遮罩 ===== -->
-        <div id="img-overlay" class="img-overlay" style="display:none" onclick="hideImageOverlay()">
+        <div id="img-overlay" class="img-overlay" style="display: none" onclick="hideImageOverlay()">
             <img id="img-overlay-img" class="img-overlay-img" src="" alt="" />
         </div>
 
@@ -1159,6 +1186,8 @@
             function loadConfig() {
                 document.getElementById("notion-token").value = localStorage.getItem("notion_token") || "";
                 document.getElementById("notion-db").value = localStorage.getItem("notion_db") || "";
+                document.getElementById("cloudinary-cloud").value = localStorage.getItem("cloudinary_cloud") || "";
+                document.getElementById("cloudinary-preset").value = localStorage.getItem("cloudinary_preset") || "";
                 if (localStorage.getItem("notion_token") && localStorage.getItem("notion_db")) {
                     testNotion();
                 }
@@ -1167,10 +1196,14 @@
             function saveConfig() {
                 localStorage.setItem("notion_token", document.getElementById("notion-token").value.trim());
                 localStorage.setItem("notion_db", document.getElementById("notion-db").value.trim());
+                localStorage.setItem("cloudinary_cloud", document.getElementById("cloudinary-cloud").value.trim());
+                localStorage.setItem("cloudinary_preset", document.getElementById("cloudinary-preset").value.trim());
             }
 
             document.getElementById("notion-token").addEventListener("input", saveConfig);
             document.getElementById("notion-db").addEventListener("input", saveConfig);
+            document.getElementById("cloudinary-cloud").addEventListener("input", saveConfig);
+            document.getElementById("cloudinary-preset").addEventListener("input", saveConfig);
 
             // ===== Tab =====
             function setTab(btn) {
@@ -1302,11 +1335,11 @@
                     const imgProp = props["图片"];
                     if (imgProp && imgProp.type === "files" && Array.isArray(imgProp.files)) {
                         images = imgProp.files
-                            .map((f) => ({
-                                url: (f.external && f.external.url) || (f.file && f.file.url) || "",
-                                name: f.name || "",
-                            }))
-                            .filter((img) => img.url);
+                        .map((f) => ({
+                            url: (f.external && f.external.url) || (f.file && f.file.url) || "",
+                            name: f.name || "",
+                        }))
+                        .filter((img) => img.url);
                     }
 
                     return {
@@ -1375,13 +1408,15 @@
                     imagesHTML =
                         `<div class="note-images">` +
                         n.images
-                            .map(
-                                (img) =>
-                                    `<div class="note-image-thumb" onclick="event.stopPropagation();showImageOverlay('${escAttr(
-                                        img.url
-                                    )}')"><img src="${escAttr(img.url)}" alt="${escAttr(img.name || "")}" loading="lazy" /></div>`
-                            )
-                            .join("") +
+                        .map(
+                            (img) =>
+                                `<div class="note-image-thumb" onclick="event.stopPropagation();showImageOverlay('${escAttr(
+                                    img.url
+                                )}')"><img src="${escAttr(img.url)}" alt="${escAttr(
+                                    img.name || ""
+                                )}" loading="lazy" /></div>`
+                        )
+                        .join("") +
                         `</div>`;
                 }
 
@@ -1412,9 +1447,15 @@
             }
 
             function escAttr(s) {
-                return (s || "")
-                .replace(/&/g, "&amp;")
-                .replace(/"/g, "&quot;");
+                return (s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+            }
+
+            // ===== Cloudinary 配置读取 =====
+            function getCloudinaryConfig() {
+                return {
+                    cloud: document.getElementById("cloudinary-cloud").value.trim(),
+                    preset: document.getElementById("cloudinary-preset").value.trim(),
+                };
             }
 
             // ===== 图片选择与预览（写作区）=====
@@ -1444,14 +1485,14 @@
 
                 wrap.style.display = "flex";
                 wrap.innerHTML = selectedFiles
-                    .map((file, i) => {
-                        const url = URL.createObjectURL(file);
-                        return `<div class="img-preview-item">
+                .map((file, i) => {
+                    const url = URL.createObjectURL(file);
+                    return `<div class="img-preview-item">
                     <img src="${url}" alt="${escAttr(file.name)}" />
                     <button class="img-preview-del" onclick="event.stopPropagation();removeSelectedFile(${i})" title="移除">&#xd7;</button>
                   </div>`;
-                    })
-                    .join("");
+                })
+                .join("");
             }
 
             function clearImagePreviews() {
@@ -1466,11 +1507,12 @@
 
             // ===== Cloudinary 上传 =====
             async function uploadToCloudinary(file) {
+                const cfg = getCloudinaryConfig();
                 const formData = new FormData();
                 formData.append("file", file);
-                formData.append("upload_preset", "shiguang_unsigned");
+                formData.append("upload_preset", cfg.preset);
 
-                const res = await fetch("https://api.cloudinary.com/v1_1/dxubop09c/image/upload", {
+                const res = await fetch("https://api.cloudinary.com/v1_1/" + cfg.cloud + "/image/upload", {
                     method: "POST",
                     body: formData,
                 });
@@ -1480,7 +1522,7 @@
                 }
 
                 const data = await res.json();
-                return { url: data.secure_url, name: file.name };
+                return {url: data.secure_url, name: file.name};
             }
 
             // ===== 保存笔记 =====
@@ -1511,11 +1553,18 @@
                 let uploadedImages = [];
 
                 if (selectedFiles.length) {
+                    const cfg = getCloudinaryConfig();
+                    if (!cfg.cloud || !cfg.preset) {
+                        statusEl.textContent = "请先填写 Cloudinary 配置 ⚙️";
+                        statusEl.className = "save-status err";
+                        btn.disabled = false;
+                        btn.textContent = "保存 ✦";
+                        return;
+                    }
+
                     btn.textContent = "上传图片中…";
                     try {
-                        uploadedImages = await Promise.all(
-                            selectedFiles.map((f) => uploadToCloudinary(f))
-                        );
+                        uploadedImages = await Promise.all(selectedFiles.map((f) => uploadToCloudinary(f)));
                     } catch (e) {
                         statusEl.textContent = "✗ " + e.message;
                         statusEl.className = "save-status err";
@@ -1731,7 +1780,7 @@
                 if (!card) return;
 
                 // 初始化编辑模式图片状态
-                editKeptImages[id] = (note.images || []).map((img) => ({ url: img.url, name: img.name }));
+                editKeptImages[id] = (note.images || []).map((img) => ({url: img.url, name: img.name}));
                 editNewFiles[id] = [];
 
                 card.setAttribute("data-editing", "1");
@@ -1781,6 +1830,16 @@
                 let newUploaded = [];
                 const newFiles = editNewFiles[id] || [];
                 if (newFiles.length) {
+                    const cfg = getCloudinaryConfig();
+                    if (!cfg.cloud || !cfg.preset) {
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = "保存";
+                        }
+                        if (errEl) errEl.textContent = "✗ 请先填写 Cloudinary 配置";
+                        return;
+                    }
+
                     saveBtn.textContent = "上传图片中…";
                     try {
                         newUploaded = await Promise.all(newFiles.map((f) => uploadToCloudinary(f)));
