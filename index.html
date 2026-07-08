@@ -830,6 +830,39 @@
                 cursor: pointer;
             }
 
+            /* 回到顶部 */
+            .back-to-top {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: var(--card);
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s, box-shadow 0.2s;
+                box-shadow: 0 2px 12px var(--shadow);
+            }
+
+            .back-to-top.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .back-to-top:hover {
+                box-shadow: 0 4px 20px rgba(92, 78, 56, 0.15);
+                color: var(--text);
+            }
+
             .note-card {
                 background: var(--card);
                 border: 1px solid var(--border);
@@ -1322,6 +1355,9 @@
                 <div class="detail-modal-body" id="detail-body"></div>
             </div>
         </div>
+
+        <!-- ===== 回到顶部 ===== -->
+        <button id="back-to-top" class="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
 
         <script>
             // ===== 密码（可改）=====
@@ -1984,6 +2020,16 @@
                 const overlay = document.getElementById("img-overlay");
                 overlay.style.display = "none";
                 document.body.style.overflow = "";
+            }
+
+            // 回到顶部
+            const backToTopBtn = document.getElementById("back-to-top");
+            window.addEventListener("scroll", () => {
+                backToTopBtn.classList.toggle("visible", window.scrollY > 400);
+            });
+
+            function scrollToTop() {
+                window.scrollTo({top: 0, behavior: "smooth"});
             }
 
             document.addEventListener("keydown", (e) => {
