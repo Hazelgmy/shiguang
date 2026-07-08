@@ -27,6 +27,24 @@
                 --shadow: rgba(92, 78, 56, 0.08);
             }
 
+            ::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent-light);
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--accent);
+            }
+
             body {
                 background: var(--bg);
                 color: var(--text);
@@ -293,7 +311,7 @@
 
             /* ===== 主体 ===== */
             .main-content {
-                max-width: 900px;
+                max-width: 1200px;
                 margin: 0 auto;
                 padding: 1.5rem 1.2rem 3rem;
             }
@@ -708,21 +726,108 @@
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
                 gap: 1rem;
             }
-            /* 卡片内容折叠样式 */
-            .note-content.collapsed {
-                max-height: 6.8em; /* 大约 4-5 行，可根据需要调整 */
+            /* 卡片内容截断 */
+            .note-content.truncated {
+                max-height: 6.8em;
                 overflow: hidden;
                 position: relative;
             }
 
-            .expand-btn {
+            .detail-btn {
                 margin-top: 0.5rem;
-                font-size: 0.82rem;
+                font-size: 0.8rem;
                 color: var(--accent);
                 background: transparent;
-                border: none;
+                border: 1px solid var(--accent-light);
+                border-radius: 14px;
                 cursor: pointer;
-                padding: 0;
+                padding: 0.25rem 0.9rem;
+                transition: all 0.2s;
+            }
+
+            .detail-btn:hover {
+                background: var(--accent);
+                color: #f7f3ee;
+            }
+
+            /* 详情弹窗 */
+            .detail-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(36, 28, 18, 0.65);
+                z-index: 9996;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.2rem;
+                animation: overlayFadeIn 0.2s ease;
+            }
+
+            .detail-modal {
+                background: var(--bg);
+                border-radius: 18px;
+                max-width: 560px;
+                width: 100%;
+                max-height: 85vh;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+                overflow: hidden;
+            }
+
+            .detail-modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.9rem 1.2rem;
+                border-bottom: 1px solid var(--border);
+                flex-shrink: 0;
+            }
+
+            .detail-modal-body {
+                padding: 1.2rem;
+                overflow-y: auto;
+                flex: 1;
+                white-space: pre-wrap;
+                word-break: break-word;
+                line-height: 1.8;
+                font-size: 0.95rem;
+            }
+
+            .detail-modal-close {
+                background: transparent;
+                border: none;
+                font-size: 1.1rem;
+                cursor: pointer;
+                color: var(--text-muted);
+                padding: 0.2rem 0.5rem;
+                border-radius: 8px;
+                line-height: 1;
+            }
+
+            .detail-modal-close:hover {
+                background: var(--card2);
+                color: var(--text);
+            }
+
+            .detail-modal-insight {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border);
+            }
+
+            .detail-modal-images {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 0.8rem;
+            }
+
+            .detail-modal-images img {
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 8px;
+                cursor: pointer;
             }
 
             .note-card {
@@ -1037,6 +1142,16 @@
                 .main-content {
                     padding: 1rem 0.8rem 3rem;
                 }
+                .detail-modal {
+                    max-width: 100%;
+                    max-height: 90vh;
+                    border-radius: 18px 18px 0 0;
+                    margin-top: auto;
+                }
+                .detail-overlay {
+                    align-items: flex-end;
+                    padding: 0;
+                }
                 .tabs {
                     gap: 0.3rem;
                 }
@@ -1195,6 +1310,17 @@
         <!-- ===== 图片全屏遮罩 ===== -->
         <div id="img-overlay" class="img-overlay" style="display: none" onclick="hideImageOverlay()">
             <img id="img-overlay-img" class="img-overlay-img" src="" alt="" />
+        </div>
+
+        <!-- ===== 详情弹窗 ===== -->
+        <div id="detail-overlay" class="detail-overlay" style="display: none" onclick="hideDetail(event)">
+            <div class="detail-modal" onclick="event.stopPropagation()">
+                <div class="detail-modal-header">
+                    <span id="detail-badge"></span>
+                    <button class="detail-modal-close" onclick="hideDetail()">✕</button>
+                </div>
+                <div class="detail-modal-body" id="detail-body"></div>
+            </div>
         </div>
 
         <script>
@@ -1519,14 +1645,14 @@
                         `</div>`;
                 }
 
-                // 判断是否需要折叠（按字符数或换行数）
+                // 判断是否需要截断
                 const rawContent = n.content || "";
                 const isLong = rawContent.length > 280 || rawContent.split(/\r?\n/).length > 6;
-                const contentHTML = `<div id="content-${n.id}" class="note-content${
-                    isLong ? " collapsed" : ""
+                const contentHTML = `<div class="note-content${
+                    isLong ? " truncated" : ""
                 }">${escHtml(n.content)}</div>`;
-                const expandBtnHTML = isLong
-                    ? `<button class="expand-btn" onclick="toggleExpand('${n.id}', this)">展开</button>`
+                const detailBtnHTML = isLong
+                    ? `<button class="detail-btn" onclick="event.stopPropagation();showDetail('${n.id}')">详情</button>`
                     : "";
 
                 return `
@@ -1540,19 +1666,59 @@
                             </div>
                         </div>
                         ${contentHTML}
-                        ${expandBtnHTML}
+                        ${detailBtnHTML}
                         ${bookHTML}
                         ${imagesHTML}
                         ${insightHTML}
                     </div>`;
             }
 
-            // 切换折叠/展开
-            function toggleExpand(noteId, btn) {
-                const el = document.getElementById("content-" + noteId);
-                if (!el) return;
-                const isCollapsed = el.classList.toggle("collapsed");
-                btn.textContent = isCollapsed ? "展开" : "收起";
+            // 详情弹窗
+            function showDetail(noteId) {
+                const note = allNotes.find((n) => n.id === noteId);
+                if (!note) return;
+                const info = TYPE_MAP[note.type] || {emoji: "📝"};
+
+                let bodyHTML = `<div style="margin-bottom:0.6rem;color:var(--text-muted);font-size:0.82rem">${note.date}</div>`;
+                bodyHTML += escHtml(note.content);
+
+                if (note.images && note.images.length) {
+                    bodyHTML +=
+                        `<div class="detail-modal-images">` +
+                        note.images
+                            .map(
+                                (img) =>
+                                    `<img src="${escAttr(img.url)}" alt="${escAttr(img.name || "")}" onclick="event.stopPropagation();showImageOverlay('${escAttr(img.url)}')" />`
+                            )
+                            .join("") +
+                        `</div>`;
+                }
+
+                if (note.type === "书单" && (note.bookName || note.bookStatus)) {
+                    const st = BOOK_STATUS[note.bookStatus] || {};
+                    bodyHTML += `<div class="note-book" style="margin-top:0.8rem">
+                        ${note.bookName ? `<span class="note-book-name">📚 ${escHtml(note.bookName)}</span>` : ""}
+                        ${note.bookStatus ? `<span class="book-status-tag" style="background:${st.color || "#8B7355"}18;color:${st.color || "#8B7355"}">${st.emoji || ""} ${note.bookStatus}</span>` : ""}
+                    </div>`;
+                }
+
+                if (note.insight) {
+                    bodyHTML += `<div class="detail-modal-insight">
+                        <div class="note-insight-label">✍️ 我的感悟</div>
+                        ${escHtml(note.insight)}
+                    </div>`;
+                }
+
+                document.getElementById("detail-badge").innerHTML = `${info.emoji} ${note.type}`;
+                document.getElementById("detail-body").innerHTML = bodyHTML;
+                document.getElementById("detail-overlay").style.display = "flex";
+                document.body.style.overflow = "hidden";
+            }
+
+            function hideDetail(e) {
+                if (e && e.target !== document.getElementById("detail-overlay")) return;
+                document.getElementById("detail-overlay").style.display = "none";
+                document.body.style.overflow = "";
             }
 
             function formatLocalTime(date) {
@@ -1821,7 +1987,10 @@
             }
 
             document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape") hideImageOverlay();
+                if (e.key === "Escape") {
+                    hideImageOverlay();
+                    hideDetail();
+                }
             });
 
             // ===== 编辑模式图片管理 =====
