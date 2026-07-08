@@ -708,6 +708,22 @@
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
                 gap: 1rem;
             }
+            /* 卡片内容折叠样式 */
+            .note-content.collapsed {
+                max-height: 6.8em; /* 大约 4-5 行，可根据需要调整 */
+                overflow: hidden;
+                position: relative;
+            }
+
+            .expand-btn {
+                margin-top: 0.5rem;
+                font-size: 0.82rem;
+                color: var(--accent);
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+            }
 
             .note-card {
                 background: var(--card);
@@ -1228,7 +1244,7 @@
                         }
                     });
                 },
-                { rootMargin: "150px" }
+                {rootMargin: "150px"}
             );
 
             // ===== 密码锁 =====
@@ -1495,38 +1511,57 @@
                             (img) =>
                                 `<div class="note-image-thumb" onclick="event.stopPropagation();showImageOverlay('${escAttr(
                                     img.url
-                                )}')"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Crect fill='%23e8e0d3' width='70' height='70'/%3E%3C/svg%3E" data-src="${escAttr(img.url)}" alt="${escAttr(
-                                    img.name || ""
-                                )}" class="lazy-img" /></div>`
+                                )}')"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Crect fill='%23e8e0d3' width='70' height='70'/%3E%3C/svg%3E" data-src="${escAttr(
+                                    img.url
+                                )}" alt="${escAttr(img.name || "")}" class="lazy-img" /></div>`
                         )
                         .join("") +
                         `</div>`;
                 }
 
+                // 判断是否需要折叠（按字符数或换行数）
+                const rawContent = n.content || "";
+                const isLong = rawContent.length > 280 || rawContent.split(/\r?\n/).length > 6;
+                const contentHTML = `<div id="content-${n.id}" class="note-content${
+                    isLong ? " collapsed" : ""
+                }">${escHtml(n.content)}</div>`;
+                const expandBtnHTML = isLong
+                    ? `<button class="expand-btn" onclick="toggleExpand('${n.id}', this)">展开</button>`
+                    : "";
+
                 return `
-          <div class="note-card" data-id="${n.id}">
-            <div class="note-card-top">
-              <span class="note-type-badge">${info.emoji} ${n.type}</span>
-              <div class="note-card-actions">
-                <button class="card-act-btn card-edit-btn" onclick="startEdit('${n.id}')" title="编辑">✎</button>
-                <button class="card-act-btn card-del-btn" onclick="deleteNote('${n.id}', this)" title="删除">✕</button>
-                <span class="note-date">${n.date}</span>
-              </div>
-            </div>
-            <div class="note-content">${escHtml(n.content)}</div>
-            ${bookHTML}
-            ${imagesHTML}
-            ${insightHTML}
-          </div>`;
+                    <div class="note-card" data-id="${n.id}">
+                        <div class="note-card-top">
+                            <span class="note-type-badge">${info.emoji} ${n.type}</span>
+                            <div class="note-card-actions">
+                                <button class="card-act-btn card-edit-btn" onclick="startEdit('${n.id}')" title="编辑">✎</button>
+                                <button class="card-act-btn card-del-btn" onclick="deleteNote('${n.id}', this)" title="删除">✕</button>
+                                <span class="note-date">${n.date}</span>
+                            </div>
+                        </div>
+                        ${contentHTML}
+                        ${expandBtnHTML}
+                        ${bookHTML}
+                        ${imagesHTML}
+                        ${insightHTML}
+                    </div>`;
+            }
+
+            // 切换折叠/展开
+            function toggleExpand(noteId, btn) {
+                const el = document.getElementById("content-" + noteId);
+                if (!el) return;
+                const isCollapsed = el.classList.toggle("collapsed");
+                btn.textContent = isCollapsed ? "展开" : "收起";
             }
 
             function formatLocalTime(date) {
                 const d = new Date(date);
                 const y = d.getFullYear();
-                const mo = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const h = String(d.getHours()).padStart(2, '0');
-                const mi = String(d.getMinutes()).padStart(2, '0');
+                const mo = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                const h = String(d.getHours()).padStart(2, "0");
+                const mi = String(d.getMinutes()).padStart(2, "0");
                 return `${y}-${mo}-${day} ${h}:${mi}`;
             }
 
@@ -2054,7 +2089,9 @@
             // ===== 删除笔记 =====
             async function deleteNote(id, btnEl) {
                 const note = allNotes.find((n) => n.id === id);
-                const snippet = note ? (note.content || "(无内容)").slice(0, 40) + (note.content && note.content.length > 40 ? "…" : "") : "";
+                const snippet = note
+                    ? (note.content || "(无内容)").slice(0, 40) + (note.content && note.content.length > 40 ? "…" : "")
+                    : "";
                 if (!confirm("确定删除这条记录吗？\n\n「" + snippet + "」")) return;
                 const token = document.getElementById("notion-token").value.trim();
                 if (!token) return;
