@@ -1362,6 +1362,7 @@
         <script>
             // ===== 密码（可改）=====
             const CORRECT_PWD = "1234";
+            const DIARY_PWD = "0000";
 
             // ===== 类型配置 =====
             const TYPE_MAP = {
@@ -1420,6 +1421,8 @@
                     document.getElementById("lock-screen").style.display = "none";
                     document.getElementById("app").style.display = "block";
                     loadConfig();
+                } else if (val === DIARY_PWD) {
+                    window.location.href = "./indexDiary.html";
                 } else {
                     document.getElementById("lock-err").textContent = "密码不对哦 🔒";
                     document.getElementById("pwd-input").value = "";

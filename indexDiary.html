@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Diary 日记 🌿</title>
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap");
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #f7f3ee;
+                --card: #efe9df;
+                --card2: #e8e0d3;
+                --text: #5c4e38;
+                --text-muted: #9a876b;
+                --accent: #8b7355;
+                --accent-light: #d4c4ad;
+                --border: rgba(139, 115, 85, 0.18);
+                --border-mid: rgba(139, 115, 85, 0.32);
+                --shadow: rgba(92, 78, 56, 0.08);
+            }
+
+            ::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent-light);
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--accent);
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+                min-height: 100vh;
+            }
+
+            .header {
+                background: var(--card);
+                border-bottom: 1px solid var(--border);
+                padding: 0.9rem 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .header-title {
+                font-size: 1.05rem;
+                font-weight: 600;
+                color: var(--text);
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+            }
+
+            .header-link {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 0.3rem 0.7rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 8px;
+                background: transparent;
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+            .header-link:hover {
+                background: var(--card2);
+                color: var(--text);
+            }
+
+            /* ===== 主体 ===== */
+            .main-content {
+                max-width: 680px;
+                margin: 0 auto;
+                padding: 1.8rem 1.2rem 4rem;
+            }
+
+            /* ===== 日记卡片 ===== */
+            .diary-card {
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 18px;
+                padding: 1.8rem 1.6rem;
+                box-shadow: 0 1px 2px rgba(92, 78, 56, 0.03), 0 8px 32px rgba(92, 78, 56, 0.05);
+            }
+
+            .diary-subtitle {
+                font-family: "Playfair Display", "Noto Serif SC", "PingFang SC", serif;
+                font-size: 0.86rem;
+                color: var(--text-muted);
+                letter-spacing: 0.06em;
+                text-align: center;
+                margin-bottom: 1.6rem;
+            }
+
+            .field {
+                margin-bottom: 1.4rem;
+            }
+
+            .field-label {
+                display: block;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-bottom: 0.5rem;
+                letter-spacing: 0.03em;
+            }
+
+            .field-input {
+                width: 100%;
+                padding: 0.6rem 0.8rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 10px;
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.95rem;
+                outline: none;
+                font-family: inherit;
+                transition: border-color 0.2s;
+            }
+
+            .field-input:focus {
+                border-color: var(--accent);
+            }
+            .field-input::placeholder {
+                color: var(--text-muted);
+            }
+
+            /* 日期输入 */
+            input[type="date"].field-input {
+                -webkit-appearance: none;
+                appearance: none;
+                color-scheme: light;
+            }
+
+            /* ===== 心情选择 ===== */
+            .mood-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .mood-btn {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.2rem;
+                padding: 0.5rem 0.7rem;
+                border: 1.5px solid var(--border-mid);
+                border-radius: 12px;
+                background: transparent;
+                color: var(--text-muted);
+                cursor: pointer;
+                font-family: inherit;
+                transition: all 0.2s;
+                min-width: 58px;
+            }
+
+            .mood-btn:hover {
+                background: var(--card2);
+                color: var(--text);
+            }
+
+            .mood-btn.active {
+                background: var(--accent);
+                color: #f7f3ee;
+                border-color: var(--accent);
+            }
+
+            .mood-emoji {
+                font-size: 1.35rem;
+                line-height: 1;
+            }
+
+            .mood-label {
+                font-size: 0.72rem;
+            }
+
+            /* ===== 正文编辑区 ===== */
+            .diary-textarea {
+                width: 100%;
+                min-height: 340px;
+                padding: 1rem 1.1rem;
+                border: 1px solid var(--border-mid);
+                border-radius: 12px;
+                background: var(--bg);
+                color: var(--text);
+                font-size: 1rem;
+                line-height: 1.9;
+                resize: vertical;
+                outline: none;
+                font-family: inherit;
+                transition: border-color 0.2s;
+            }
+
+            .diary-textarea:focus {
+                border-color: var(--accent);
+            }
+            .diary-textarea::placeholder {
+                color: var(--text-muted);
+            }
+
+            /* ===== 标签 ===== */
+            .tags-wrap {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.4rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .tags-wrap:empty {
+                display: none;
+            }
+
+            .tag-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+                padding: 0.28rem 0.65rem;
+                background: var(--card2);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: 14px;
+                font-size: 0.8rem;
+            }
+
+            .tag-del {
+                border: none;
+                background: transparent;
+                color: var(--text-muted);
+                cursor: pointer;
+                font-size: 0.85rem;
+                line-height: 1;
+                padding: 0;
+                transition: color 0.15s;
+            }
+
+            .tag-del:hover {
+                color: #b85c5c;
+            }
+
+            /* ===== 保存区 ===== */
+            .diary-actions {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 0.6rem;
+                margin-top: 0.4rem;
+            }
+
+            .save-status {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+            }
+
+            .save-status.ok {
+                color: #7a9e6b;
+            }
+
+            .save-btn {
+                padding: 0.55rem 1.5rem;
+                background: var(--accent);
+                color: #f7f3ee;
+                border: none;
+                border-radius: 10px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                font-weight: 500;
+                transition: opacity 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+                font-family: inherit;
+            }
+
+            .save-btn:hover {
+                opacity: 0.85;
+            }
+
+            /* ===== 响应式 ===== */
+            @media (max-width: 768px) {
+                .header {
+                    padding: 0.8rem 1rem;
+                }
+                .main-content {
+                    padding: 1rem 0.8rem 3rem;
+                }
+                .diary-card {
+                    padding: 1.4rem 1.1rem;
+                }
+                .diary-textarea {
+                    min-height: 260px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 顶部标题栏 -->
+        <header class="header">
+            <span class="header-title">📔 Diary 日记</span>
+            <div class="header-actions">
+                <a class="header-link" href="/index.html">← 拾光</a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="diary-card">
+                <div class="diary-subtitle">今日 · 与自己的安静对话</div>
+
+                <!-- 日期 -->
+                <div class="field">
+                    <label class="field-label" for="diary-date">📅 日期</label>
+                    <input class="field-input" type="date" id="diary-date" />
+                </div>
+
+                <!-- 心情 -->
+                <div class="field">
+                    <label class="field-label">🌤️ 心情</label>
+                    <div class="mood-row" id="mood-row">
+                        <button class="mood-btn" data-label="开心" onclick="pickMood(this)">
+                            <span class="mood-emoji">😊</span><span class="mood-label">开心</span>
+                        </button>
+                        <button class="mood-btn" data-label="平静" onclick="pickMood(this)">
+                            <span class="mood-emoji">😌</span><span class="mood-label">平静</span>
+                        </button>
+                        <button class="mood-btn" data-label="幸福" onclick="pickMood(this)">
+                            <span class="mood-emoji">🥰</span><span class="mood-label">幸福</span>
+                        </button>
+                        <button class="mood-btn" data-label="思考" onclick="pickMood(this)">
+                            <span class="mood-emoji">🤔</span><span class="mood-label">思考</span>
+                        </button>
+                        <button class="mood-btn" data-label="失落" onclick="pickMood(this)">
+                            <span class="mood-emoji">😔</span><span class="mood-label">失落</span>
+                        </button>
+                        <button class="mood-btn" data-label="难过" onclick="pickMood(this)">
+                            <span class="mood-emoji">😢</span><span class="mood-label">难过</span>
+                        </button>
+                        <button class="mood-btn" data-label="生气" onclick="pickMood(this)">
+                            <span class="mood-emoji">😠</span><span class="mood-label">生气</span>
+                        </button>
+                        <button class="mood-btn" data-label="疲惫" onclick="pickMood(this)">
+                            <span class="mood-emoji">😴</span><span class="mood-label">疲惫</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 日记标题 -->
+                <div class="field">
+                    <label class="field-label" for="diary-title">✏️ 日记标题</label>
+                    <input class="field-input" type="text" id="diary-title" placeholder="给今天取个名字…" />
+                </div>
+
+                <!-- 正文 -->
+                <div class="field">
+                    <label class="field-label" for="diary-content">📝 正文</label>
+                    <textarea
+                        class="diary-textarea"
+                        id="diary-content"
+                        placeholder="今天发生了什么，心里在想什么……"
+                    ></textarea>
+                </div>
+
+                <!-- 标签 -->
+                <div class="field">
+                    <label class="field-label">🏷️ 标签</label>
+                    <div class="tags-wrap" id="tags-wrap"></div>
+                    <div class="tag-input-row">
+                        <input class="field-input" type="text" id="tag-input" placeholder="输入标签后按回车…" />
+                    </div>
+                </div>
+
+                <!-- 保存 -->
+                <div class="diary-actions">
+                    <span class="save-status" id="save-status"></span>
+                    <button class="save-btn" onclick="onSave()">保存 ✦</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let selectedMood = "";
+            let tags = [];
+
+            // ===== 日期：默认今天 =====
+            function todayStr() {
+                const d = new Date();
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                return y + "-" + m + "-" + day;
+            }
+
+            document.getElementById("diary-date").value = todayStr();
+
+            // ===== 心情选择 =====
+            function pickMood(btn) {
+                document.querySelectorAll("#mood-row .mood-btn").forEach((b) => b.classList.remove("active"));
+                btn.classList.add("active");
+                selectedMood = btn.dataset.label;
+            }
+
+            // ===== 标签 =====
+            document.getElementById("tag-input").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag();
+                }
+            });
+
+            function addTag() {
+                const input = document.getElementById("tag-input");
+                const val = input.value.trim();
+                if (!val) return;
+                if (tags.includes(val)) {
+                    input.value = "";
+                    return;
+                }
+                tags.push(val);
+                input.value = "";
+                renderTags();
+            }
+
+            function removeTag(index) {
+                tags.splice(index, 1);
+                renderTags();
+            }
+
+            function renderTags() {
+                const wrap = document.getElementById("tags-wrap");
+                wrap.innerHTML = tags
+                    .map(
+                        (t, i) =>
+                            `<span class="tag-chip">#${escHtml(t)}<button class="tag-del" onclick="removeTag(${i})" title="移除">×</button></span>`
+                    )
+                    .join("");
+            }
+
+            // ===== 保存（暂不实现保存逻辑）=====
+            function onSave() {
+                const statusEl = document.getElementById("save-status");
+                statusEl.textContent = "保存功能即将接入 ✨";
+                statusEl.className = "save-status ok";
+                setTimeout(() => {
+                    statusEl.textContent = "";
+                    statusEl.className = "save-status";
+                }, 2500);
+            }
+
+            function escHtml(s) {
+                return (s || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+        </script>
+    </body>
+</html>
