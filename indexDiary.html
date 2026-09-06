@@ -367,17 +367,21 @@
     .moods {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
       flex-wrap: wrap;
       flex: 1;
     }
 
     .mood {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       border: 0;
       background: transparent;
+      color: inherit;
       opacity: 0.42;
-      font-size: 19px;
-      padding: 0;
+      padding: 2px 6px;
+      border-radius: 6px;
       transition: 0.16s;
     }
 
@@ -385,6 +389,17 @@
     .mood.active {
       opacity: 1;
       transform: translateY(-2px);
+    }
+
+    .mood-emoji {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .mood-label {
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
     .save {
@@ -678,7 +693,7 @@
       }
 
       .moods {
-        gap: 10px;
+        gap: 6px;
       }
 
       .mood {
@@ -781,20 +796,14 @@
           <input id="timeInput" type="time" readonly />
 
           <div class="moods">
-            <button class="mood" data-mood="开心" title="开心">😄</button>
-            <button class="mood" data-mood="满足" title="满足">😊</button>
-            <button class="mood" data-mood="平静" title="平静">😌</button>
-            <button class="mood" data-mood="思考" title="思考">🤔</button>
-            <button class="mood" data-mood="兴奋" title="兴奋">🤩</button>
-            <button class="mood" data-mood="期待" title="期待">😍</button>
-            <button class="mood" data-mood="普通" title="普通">😐</button>
-            <button class="mood" data-mood="迷茫" title="迷茫">😕</button>
-            <button class="mood" data-mood="焦虑" title="焦虑">😟</button>
-            <button class="mood" data-mood="低落" title="低落">😔</button>
-            <button class="mood" data-mood="生气" title="生气">😡</button>
-            <button class="mood" data-mood="压力大" title="压力大">😫</button>
-            <button class="mood" data-mood="成长" title="成长">🌱</button>
-            <button class="mood" data-mood="灵感" title="灵感">💡</button>
+            <button class="mood" data-mood="开心"><span class="mood-emoji">😄</span><span class="mood-label">开心</span></button>
+            <button class="mood" data-mood="思考"><span class="mood-emoji">🤔</span><span class="mood-label">思考</span></button>
+            <button class="mood" data-mood="兴奋"><span class="mood-emoji">🤩</span><span class="mood-label">兴奋</span></button>
+            <button class="mood" data-mood="焦虑"><span class="mood-emoji">😟</span><span class="mood-label">焦虑</span></button>
+            <button class="mood" data-mood="低落"><span class="mood-emoji">😔</span><span class="mood-label">低落</span></button>
+            <button class="mood" data-mood="生气"><span class="mood-emoji">😡</span><span class="mood-label">生气</span></button>
+            <button class="mood" data-mood="成长"><span class="mood-emoji">🌱</span><span class="mood-label">成长</span></button>
+            <button class="mood" data-mood="灵感"><span class="mood-emoji">💡</span><span class="mood-label">灵感</span></button>
           </div>
 
           <button id="saveBtn" class="save">Save</button>
@@ -1570,9 +1579,7 @@
 
     document.querySelectorAll('.tag-option').forEach(btn => {
       btn.onclick = () => {
-        const isActive = btn.classList.contains('active')
-        document.querySelectorAll('.tag-option').forEach(b => b.classList.remove('active'))
-        if (!isActive) btn.classList.add('active')
+        btn.classList.toggle('active')
       }
     })
 
