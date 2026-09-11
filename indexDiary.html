@@ -160,25 +160,6 @@
       background: rgba(255, 255, 255, 0.18);
     }
 
-    .brand {
-      margin-bottom: 34px;
-    }
-
-    .brand-title {
-      margin: 0;
-      font-size: 29px;
-      font-weight: 400;
-      font-style: italic;
-      letter-spacing: 2px;
-    }
-
-    .brand-subtitle {
-      margin-top: 7px;
-      font-size: 13px;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
-
     .search {
       width: 100%;
       border: 0;
@@ -338,15 +319,6 @@
       font-size: 14px;
       line-height: 1.5;
       transition: 0.15s ease;
-    }
-
-    .entry-tags {
-      margin-top: 5px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-size: 11px;
-      color: #a99d90;
     }
 
     .empty {
@@ -780,11 +752,6 @@
   <div class="app">
 
     <aside class="sidebar">
-      <div class="brand">
-        <h1 class="brand-title">Diary</h1>
-        <div class="brand-subtitle">A quiet personal space.</div>
-      </div>
-
       <input
         id="search"
         class="search"
@@ -960,6 +927,17 @@
       return `${String(date.getHours()).padStart(2, '0')}:${String(
         date.getMinutes()
       ).padStart(2, '0')}`
+    }
+
+    const MOOD_EMOJI = {
+      开心: '😄',
+      思考: '🤔',
+      兴奋: '🤩',
+      焦虑: '😟',
+      低落: '😔',
+      生气: '😡',
+      成长: '🌱',
+      灵感: '💡',
     }
 
     function esc(s) {
@@ -1519,6 +1497,8 @@
           const text = [
             entry.title,
             entry.content,
+            entry.mood,
+            entry.mood ? MOOD_EMOJI[entry.mood] : '',
             ...(entry.tags || [])
           ]
             .join(' ')
@@ -1542,21 +1522,21 @@
         if (entry.date === selectedDate) item.classList.add('active')
 
         const tags = (entry.tags || [])
-          .map(tag => `<span>#${esc(tag)}</span>`)
-          .join('')
+          .map(tag => `#${esc(tag)}`)
+          .join(' · ')
+
+        const moodText = entry.mood
+          ? ` · ${MOOD_EMOJI[entry.mood] || ''} ${entry.mood}`
+          : ''
 
         item.innerHTML = `
           <button class="entry-delete" title="删除">×</button>
           <div class="entry-date">
-            ${entry.date.slice(5).replace('-', '.')}${entry.time ? ' · ' + entry.time : ''}
+            ${entry.date.slice(5).replace('-', '.')}${entry.time ? ' · ' + entry.time : ''}${moodText}${tags ? ' · ' + tags : ''}
           </div>
 
           <div class="entry-name">
             ${esc(entry.title || '无题')}
-          </div>
-
-          <div class="entry-tags">
-            ${tags}
           </div>
         `
 
