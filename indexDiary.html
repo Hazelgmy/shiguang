@@ -637,19 +637,49 @@
         min-height: auto;
         border-right: 0;
         border-bottom: 1px solid var(--line);
+        padding: 24px 20px;
       }
 
       .main {
-        padding: 45px 25px;
+        padding: 24px 18px 48px;
       }
 
       .meta {
-        gap: 14px;
+        gap: 12px;
         flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+
+      .moods {
+        order: 3;
+        flex-basis: 100%;
+        gap: 6px;
+      }
+
+      .mood {
+        padding: 5px 8px;
       }
 
       .save {
-        margin-left: 0;
+        margin-left: auto;
+      }
+
+      .title-input {
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      .content {
+        font-size: 16px;
+      }
+
+      .search {
+        font-size: 16px;
+      }
+
+      .calendar-nav button {
+        padding: 6px 8px;
+        font-size: 20px;
       }
     }
 
@@ -1288,6 +1318,7 @@
           selectedDate = date
           loadEntry(date)
           renderCalendar()
+          scrollToEditor()
         }
 
         calendarDays.appendChild(el)
@@ -1555,6 +1586,7 @@
 
           loadEntry(entry.date)
           renderCalendar()
+          scrollToEditor()
         }
 
         entriesList.appendChild(item)
@@ -1573,6 +1605,12 @@
       setTimeout(() => {
         tip.classList.remove('show')
       }, 1600)
+    }
+
+    function scrollToEditor() {
+      if (!window.matchMedia('(max-width: 850px)').matches) return
+      const main = document.querySelector('.main')
+      if (main) main.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
 
     // ===== 标签（随笔 / 日记 二选一）=====
