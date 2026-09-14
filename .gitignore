@@ -1,0 +1,5 @@
+# WorkBuddy 项目记忆（本地笔记，不入库）
+.workbuddy/
+
+# Cloudflare Worker 代理源码（线上单独部署，不入库）
+worker.js

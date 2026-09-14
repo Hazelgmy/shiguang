@@ -526,6 +526,72 @@
       color: var(--text);
     }
 
+    /* ===== 附件 ===== */
+    .atts-strip {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 12px 0 10px;
+    }
+
+    .atts-strip:empty {
+      display: none;
+    }
+
+    .att-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+      max-width: 460px;
+    }
+
+    .att-row .att-name {
+      flex: 1;
+      color: #8d6e52;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .att-row .att-name:hover {
+      text-decoration: underline;
+    }
+
+    .att-row .att-name-static {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .att-remove {
+      border: 0;
+      background: transparent;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1;
+      padding: 2px 6px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+
+    .att-remove:hover {
+      color: #b85c5c;
+    }
+
+    .att-new-badge {
+      background: #9b8063;
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
     .image-overlay {
       position: fixed;
       inset: 0;
@@ -852,6 +918,10 @@
           <div class="images-strip" id="imagesStrip"></div>
           <button class="add-image" id="addImageBtn">＋ 图片</button>
           <input type="file" id="imageFileInput" accept="image/*" multiple hidden />
+
+          <div class="atts-strip" id="attsStrip"></div>
+          <button class="add-image" id="addAttBtn">＋ 文件</button>
+          <input type="file" id="attFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.csv,.zip" multiple hidden />
         </div>
 
         <div class="footer">
@@ -928,6 +998,15 @@
     let currentImages = []
     let newImageFiles = []
 
+    // 附件状态
+    // 5 MiB = 免费版 Notion 工作区的单文件上传硬限制（官方 max_file_upload_size_in_bytes = 5242880），
+    // 超过会被 Notion 拒绝。注意：20 MiB 只是 API single_part / multi_part 的分界线，
+    // 并不代表免费版能传 20MB。付费版上限为 5 GiB。
+    const MAX_ATT_SIZE = 5 * 1024 * 1024 // 单文件最大 5MiB
+    const MAX_ATT_SIZE_MB = MAX_ATT_SIZE / 1024 / 1024
+    let currentAtts = [] // 已有附件
+    let newAttFiles = [] // 本次新增附件
+
     const today = new Date()
 
     let currentYear = today.getFullYear()
@@ -945,6 +1024,7 @@
     const searchInput = document.getElementById('search')
     const saveBtn = document.getElementById('saveBtn')
     const imagesStrip = document.getElementById('imagesStrip')
+    const attsStrip = document.getElementById('attsStrip')
 
     function formatDate(date) {
       const y = date.getFullYear()
@@ -1043,6 +1123,19 @@
           .filter(i => i.url)
       }
 
+      // 附件：kind 标记来源，external = 外部链接，file = Notion 托管文件
+      let attachments = []
+      const attProp = props['附件']
+      if (attProp && Array.isArray(attProp.files)) {
+        attachments = attProp.files
+          .map(f => {
+            if (f.external && f.external.url) return { url: f.external.url, name: f.name || '', kind: 'external' }
+            if (f.file && f.file.url) return { url: f.file.url, name: f.name || '', kind: 'file' }
+            return null
+          })
+          .filter(Boolean)
+      }
+
       return {
         id: page.id,
         date,
@@ -1051,6 +1144,7 @@
         mood: textOf(props, '心情'),
         tags: textOf(props, '标签').split(',').map(t => t.trim()).filter(Boolean),
         images,
+        attachments,
       }
     }
 
@@ -1173,6 +1267,249 @@
       const data = await res.json()
       return { url: data.secure_url, name: file.name }
     }
+
+    // ===== 附件（Notion File Upload API，经 Worker 代理）=====
+    function attIcon(name) {
+      const ext = (String(name || '').split('.').pop() || '').toLowerCase()
+      const map = {
+        pdf: '📄', doc: '📝', docx: '📝',
+        xls: '📊', xlsx: '📊', csv: '📊',
+        ppt: '📽️', pptx: '📽️',
+        txt: '📃', md: '📑', zip: '🗜️',
+      }
+      return map[ext] || '📎'
+    }
+
+    function attExt(name) {
+      const s = String(name || '')
+      const i = s.lastIndexOf('.')
+      return i >= 0 ? s.slice(i + 1).toLowerCase() : ''
+    }
+
+    // 纯文本文件白名单：只有这些后缀会在上传前被读取/补 UTF-8 BOM。
+    // 其余（PDF/Word/Excel/PPT/ZIP/图片等）一律视为二进制，完全不处理。
+    const TEXT_ATT_EXTS = ['md', 'markdown', 'txt', 'text', 'csv', 'tsv', 'log']
+
+    function isTextAtt(file) {
+      return TEXT_ATT_EXTS.indexOf(attExt(file.name)) >= 0
+    }
+
+    // 纯文本文件的 MIME 强制带 charset=utf-8，帮助 Notion 按 UTF-8 解码预览
+    const TEXT_ATT_MIME = {
+      md: 'text/markdown; charset=utf-8',
+      markdown: 'text/markdown; charset=utf-8',
+      txt: 'text/plain; charset=utf-8',
+      text: 'text/plain; charset=utf-8',
+      csv: 'text/csv; charset=utf-8',
+      tsv: 'text/tab-separated-values; charset=utf-8',
+      log: 'text/plain; charset=utf-8',
+    }
+
+    function attContentType(file) {
+      const ext = attExt(file.name)
+      // 纯文本：忽略浏览器给的 file.type，统一带 charset=utf-8
+      if (TEXT_ATT_MIME[ext]) return TEXT_ATT_MIME[ext]
+      if (file.type) return file.type
+      const map = {
+        pdf: 'application/pdf',
+        doc: 'application/msword',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        xls: 'application/vnd.ms-excel',
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ppt: 'application/vnd.ms-powerpoint',
+        pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        zip: 'application/zip',
+      }
+      return map[ext] || 'application/octet-stream'
+    }
+
+    // 纯文本文件上传前确保带 UTF-8 BOM（EF BB BF）
+    // · 非文本文件（PDF/Word/Excel/PPT/ZIP/图片…）→ 原样返回，不读不写不处理
+    // · 已有 BOM → 不补字节，仅把 MIME 归一成带 charset=utf-8 的形式
+    // · 没有 BOM → 只在最前面补 3 个字节
+    // 文件名始终保持不变
+    async function withUtf8Bom(file) {
+      if (!isTextAtt(file)) return file
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const hasBom = bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf
+      const type = attContentType(file)
+      const out = hasBom
+        ? new File([bytes], file.name, { type })
+        : new File([new Uint8Array([0xef, 0xbb, 0xbf]), bytes], file.name, { type })
+      console.log('[附件] ' + file.name + ' 文本文件 · ' + (hasBom ? '已有 BOM（原样）' : '已补 UTF-8 BOM') + ' · content_type=' + type)
+      return out
+    }
+
+    // Notion File Upload API 版本（只用于附件上传这两个请求，
+    // 避免升级后影响现有 databases/pages/blocks 的调用行为）
+    const NOTION_UPLOAD_VERSION = '2026-03-11'
+
+    // 附件上传专用请求头
+    // withJson = true  → 第一步 create：带 Content-Type: application/json
+    // withJson = false → 第二步 send：绝对不带 Content-Type，由浏览器生成 multipart boundary
+    function getUploadHeaders(withJson) {
+      const headers = {
+        Authorization: 'Bearer ' + notionToken.value.trim(),
+        'Notion-Version': NOTION_UPLOAD_VERSION,
+      }
+      if (withJson) headers['Content-Type'] = 'application/json'
+      return headers
+    }
+
+    // 读取 Notion 错误信息（含 code，方便定位 invalid_json 之类的问题）
+    async function notionErrorMessage(res) {
+      let msg = 'HTTP ' + res.status
+      try {
+        const err = await res.json()
+        if (err && err.message) msg = err.message + (err.code ? '（' + err.code + '）' : '')
+      } catch (e) {}
+      return msg
+    }
+
+    // 把保存失败的 Notion 报错翻译成可操作的提示
+    function saveErrorTip(err, res) {
+      const msg = (err && err.message) || String(res && res.status)
+      // 日记库还没建「附件」字段时最常见：validation_error + "附件 is not a property that exists."
+      if (err && err.code === 'validation_error' && msg.indexOf('附件') >= 0) {
+        alert(
+          '日记数据库里还没有「附件」字段，所以带附件的保存会被拒绝。\n\n' +
+            '请在 Notion 的日记数据库中新增一个属性：\n' +
+            '· 名称：附件（三个字，必须一模一样）\n' +
+            '· 类型：Files & media\n\n' +
+            '建好后再点一次保存即可，已选好的文件不会丢。'
+        )
+        return '缺少「附件」字段'
+      }
+      return '保存失败：' + msg
+    }
+
+    // 上传单个附件：创建 file upload → 发送文件内容 → 返回 {id, name}
+    async function uploadAttToNotion(rawFile) {
+      // 纯文本文件（.md/.txt/.csv 等）先补 UTF-8 BOM 再上传；二进制文件原样透传
+      const file = await withUtf8Bom(rawFile)
+
+      // ===== 第 1 步：创建 File Upload（必须是 JSON，不能是 FormData）=====
+      const createRes = await fetch(PROXY_BASE + '/file_uploads', {
+        method: 'POST',
+        headers: getUploadHeaders(true),
+        body: JSON.stringify({
+          mode: 'single_part',
+          filename: file.name,
+          content_type: attContentType(file),
+        }),
+      })
+      if (!createRes.ok) {
+        throw new Error('「' + file.name + '」第 1 步创建上传失败（/v1/file_uploads）：' + (await notionErrorMessage(createRes)))
+      }
+      const fu = await createRes.json()
+      if (!fu || !fu.id) {
+        throw new Error('「' + file.name + '」第 1 步创建上传失败：响应里没有 file_upload id')
+      }
+
+      // ===== 第 2 步：发送文件内容（multipart/form-data，手动设置 Content-Type 会破坏 boundary）=====
+      const formData = new FormData()
+      formData.append('file', file, file.name)
+      const sendRes = await fetch(PROXY_BASE + '/file_uploads/' + fu.id + '/send', {
+        method: 'POST',
+        headers: getUploadHeaders(false),
+        body: formData,
+      })
+      if (!sendRes.ok) {
+        const msg = await notionErrorMessage(sendRes)
+        const hint =
+          msg.indexOf('invalid_json') >= 0
+            ? '（提示：说明 Worker 把 /file_uploads/{id}/send 的 Content-Type 改写成了 application/json，需在 Worker 里原样透传 multipart）'
+            : ''
+        throw new Error('「' + file.name + '」第 2 步发送文件失败（/v1/file_uploads/{id}/send）：' + msg + hint)
+      }
+
+      return { id: fu.id, name: file.name }
+    }
+
+    // 从保存/创建页面响应中解析「附件」属性（拿到 Notion 生成的真实下载 URL）
+    function parseAttProp(prop) {
+      if (!prop || !Array.isArray(prop.files)) return []
+      return prop.files
+        .map(f => {
+          if (f.external && f.external.url) return { url: f.external.url, name: f.name || '', kind: 'external' }
+          if (f.file && f.file.url) return { url: f.file.url, name: f.name || '', kind: 'file' }
+          return null
+        })
+        .filter(Boolean)
+    }
+
+    function attRow(att, kind) {
+      const row = document.createElement('div')
+      row.className = 'att-row'
+
+      const icon = document.createElement('span')
+      icon.textContent = attIcon(att.name)
+
+      const name = document.createElement(kind === 'current' ? 'a' : 'span')
+      if (kind === 'current') {
+        name.className = 'att-name'
+        name.href = att.url
+        name.target = '_blank'
+        name.rel = 'noopener'
+        name.title = '打开/下载文件'
+      } else {
+        name.className = 'att-name-static'
+      }
+      name.textContent = att.name
+      name.title = att.name
+
+      row.appendChild(icon)
+      row.appendChild(name)
+
+      if (kind === 'new') {
+        const badge = document.createElement('span')
+        badge.className = 'att-new-badge'
+        badge.textContent = '新'
+        row.appendChild(badge)
+      }
+
+      const del = document.createElement('button')
+      del.className = 'att-remove'
+      del.textContent = '×'
+      del.title = '移除'
+      del.onclick = e => {
+        e.stopPropagation()
+        if (kind === 'current') currentAtts.splice(Number(row.dataset.index), 1)
+        else newAttFiles.splice(Number(row.dataset.index), 1)
+        renderAtts()
+      }
+      row.appendChild(del)
+
+      return row
+    }
+
+    function renderAtts() {
+      attsStrip.innerHTML = ''
+      currentAtts.forEach((a, i) => {
+        const row = attRow(a, 'current')
+        row.dataset.index = i
+        attsStrip.appendChild(row)
+      })
+      newAttFiles.forEach((f, i) => {
+        const row = attRow({ name: f.name }, 'new')
+        row.dataset.index = i
+        attsStrip.appendChild(row)
+      })
+    }
+
+    document.getElementById('addAttBtn').onclick = () =>
+      document.getElementById('attFileInput').click()
+
+    document.getElementById('attFileInput').addEventListener('change', e => {
+      const files = Array.from(e.target.files)
+      const tooBig = files.filter(f => f.size > MAX_ATT_SIZE)
+      if (tooBig.length) {
+        alert('以下文件超过 ' + MAX_ATT_SIZE_MB + 'MB，已跳过：\n' + tooBig.map(f => '• ' + f.name).join('\n'))
+      }
+      newAttFiles = newAttFiles.concat(files.filter(f => f.size <= MAX_ATT_SIZE))
+      renderAtts()
+      e.target.value = ''
+    })
 
     function imageItem(src, name, kind, index) {
       const div = document.createElement('div')
@@ -1339,6 +1676,8 @@
 
       currentImages = entry && entry.images ? entry.images.slice() : []
       newImageFiles = []
+      currentAtts = entry && entry.attachments ? entry.attachments.slice() : []
+      newAttFiles = []
       contentInput.value = ''
 
       if (entry) {
@@ -1377,6 +1716,7 @@
       }
 
       renderImages()
+      renderAtts()
       updateWordCount()
     }
 
@@ -1410,6 +1750,24 @@
       }
 
       const allImages = currentImages.concat(uploaded)
+
+      // 上传新增附件（Notion File Upload API）
+      let uploadedAtts = []
+      if (newAttFiles.length) {
+        saveBtn.textContent = '上传文件中…'
+        try {
+          for (const f of newAttFiles) {
+            uploadedAtts.push(await uploadAttToNotion(f))
+          }
+        } catch (e) {
+          showTip('文件上传失败：' + e.message)
+          saveBtn.textContent = 'Save'
+          return
+        }
+      }
+      // kind: upload = 本次刚上传（还没有 URL），保存后从响应里解析真实 URL
+      const allAtts = currentAtts.concat(uploadedAtts.map(u => ({ name: u.name, id: u.id, kind: 'upload' })))
+
       const mood = document.querySelector('.mood.active')?.dataset.mood || ''
       const title = titleInput.value.trim() || '无题'
       const content = contentInput.value
@@ -1423,6 +1781,18 @@
         图片: { files: allImages.map(img => ({ name: img.name, external: { url: img.url } })) },
       }
       if (mood) properties['心情'] = { select: { name: mood } }
+      // 只在有附件时写入「附件」，避免数据库还没有该字段时保存报错
+      if (allAtts.length) {
+        properties['附件'] = {
+          files: allAtts.map(a =>
+            a.kind === 'external'
+              ? { name: a.name, external: { url: a.url } }
+              : a.kind === 'file'
+                ? { name: a.name, type: 'file', file: { url: a.url } }
+                : { name: a.name, type: 'file_upload', file_upload: { id: a.id } }
+          ),
+        }
+      }
 
       saveBtn.textContent = '保存中…'
       try {
@@ -1436,7 +1806,7 @@
           })
           if (!res.ok) {
             const err = await res.json()
-            showTip('保存失败：' + (err.message || res.status))
+            showTip(saveErrorTip(err, res))
             saveBtn.textContent = 'Save'
             return
           }
@@ -1452,13 +1822,14 @@
           })
           if (!res.ok) {
             const err = await res.json()
-            showTip('保存失败：' + (err.message || res.status))
+            showTip(saveErrorTip(err, res))
             saveBtn.textContent = 'Save'
             return
           }
           page = await res.json()
         }
 
+        const savedAtts = parseAttProp(page.properties && page.properties['附件'])
         entries[date] = {
           id: page.id,
           date,
@@ -1468,10 +1839,14 @@
           content,
           tags,
           images: allImages,
+          attachments: savedAtts,
         }
         currentImages = allImages.slice()
         newImageFiles = []
+        currentAtts = savedAtts.slice()
+        newAttFiles = []
         renderImages()
+        renderAtts()
         selectedDate = date
         showTip('Saved')
         renderCalendar()
