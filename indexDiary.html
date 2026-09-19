@@ -146,6 +146,30 @@
       background: #eee9e0;
     }
 
+    .view-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .view-tab,
+    .event-view-tab {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      padding: 6px 16px;
+      font-size: 12px;
+      transition: 0.18s ease;
+    }
+
+    .view-tab:hover,
+    .event-view-tab:hover,
+    .view-tab.active,
+    .event-view-tab.active {
+      background: #eee9e0;
+    }
+
     .app {
       min-height: 100vh;
       display: grid;
@@ -177,28 +201,42 @@
     }
 
     .calendar-header {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 92px;
       align-items: center;
+      gap: 10px;
       margin-bottom: 23px;
     }
 
     .calendar-title {
       letter-spacing: 4px;
       font-size: 16px;
+      min-width: 0;
+      white-space: nowrap;
     }
 
     .calendar-nav {
       display: flex;
-      gap: 13px;
+      justify-content: flex-end;
+      gap: 8px;
+      width: 92px;
     }
 
     .calendar-nav button {
       border: 0;
+      width: 36px;
+      height: 36px;
       background: transparent;
       color: var(--muted);
-      padding: 3px;
-      font-size: 18px;
+      padding: 0;
+      border-radius: 10px;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .calendar-nav button:hover {
+      background: rgba(76, 72, 65, 0.07);
+      color: var(--text);
     }
 
     .weekdays,
@@ -328,6 +366,22 @@
       font-size: 13px;
     }
 
+    .event-day-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .event-day-item {
+      border-bottom: 1px solid rgba(222, 216, 205, 0.55);
+      padding: 0 0 10px;
+      cursor: pointer;
+    }
+
+    .event-day-item-title {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
     /* Editor */
 
     .main {
@@ -344,9 +398,10 @@
     }
 
     .meta {
-      display: flex;
+      display: grid;
+      grid-template-columns: 112px 64px minmax(640px, 1fr) 112px;
       align-items: center;
-      gap: 28px;
+      column-gap: 12px;
       color: #7f786e;
       font-size: 13px;
       margin-bottom: 62px;
@@ -370,8 +425,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
-      flex: 1;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow: visible;
     }
 
     .mood {
@@ -405,13 +461,14 @@
     }
 
     .save {
-      margin-left: auto;
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 7px 20px;
+      width: 112px;
       background: transparent;
       color: #756d63;
       transition: 0.18s ease;
+      white-space: nowrap;
     }
 
     .save:hover {
@@ -450,6 +507,51 @@
 
     .content::placeholder {
       color: #bdb5a9;
+    }
+
+    .event-fields {
+      margin: -14px 0 24px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .event-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 14px;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .event-extra {
+      display: none;
+      flex: 1;
+      min-width: 0;
+      grid-template-columns: minmax(0, 1fr) 150px;
+      gap: 12px;
+    }
+
+    .event-extra.show {
+      display: grid;
+    }
+
+    .event-extra input,
+    .event-extra select,
+    .quick-event-form input,
+    .quick-event-form select,
+    .quick-event-form textarea {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.22);
+      color: var(--text);
+      outline: none;
+      padding: 10px 12px;
     }
 
     /* ===== 图片 ===== */
@@ -654,6 +756,202 @@
       font-size: 12px;
     }
 
+    .event-workspace {
+      max-width: 940px;
+      margin: 0 auto;
+      height: 100%;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .event-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .event-title {
+      font-size: 34px;
+      letter-spacing: 2px;
+      font-weight: 400;
+    }
+
+    .event-view-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .timeline-year {
+      margin: 22px 0 10px;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .timeline-month {
+      margin: 12px 0 6px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      font-size: 15px;
+    }
+
+    .timeline-item {
+      border-left: 1px solid var(--line);
+      padding: 0 0 14px 16px;
+      cursor: pointer;
+    }
+
+    .timeline-date {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .timeline-name {
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .timeline-summary {
+      margin-top: 8px;
+      color: #6f675e;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .event-calendar-head,
+    .event-day-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .event-calendar-title {
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+
+    .event-calendar-grid,
+    .event-calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .event-calendar-weekdays {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .event-calendar-day {
+      min-height: 82px;
+      border: 1px solid rgba(222, 216, 205, 0.75);
+      padding: 8px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .event-calendar-day.other {
+      color: #c8c0b4;
+      background: transparent;
+    }
+
+    .event-calendar-day.selected {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .event-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: #eee9e0;
+      font-size: 11px;
+    }
+
+    .event-calendar-items {
+      display: grid;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .event-calendar-item {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #6f675e;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .event-day-panel {
+      margin-top: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+
+    .quick-event-form {
+      display: none;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .quick-event-form.show {
+      display: grid;
+    }
+
+    .quick-event-form textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .event-detail-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(46, 42, 36, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .event-detail-modal {
+      width: min(720px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 80px rgba(64, 59, 53, 0.18);
+    }
+
+    .event-detail-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .event-detail-images img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
     .saved-tip {
       position: fixed;
       right: 30px;
@@ -712,15 +1010,16 @@
       }
 
       .meta {
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
-        flex-wrap: wrap;
         margin-bottom: 24px;
       }
 
       .moods {
-        order: 3;
-        flex-basis: 100%;
+        grid-column: 1 / -1;
+        flex-wrap: wrap;
         gap: 6px;
+        overflow: visible;
       }
 
       .mood {
@@ -728,7 +1027,7 @@
       }
 
       .save {
-        margin-left: auto;
+        width: 100%;
       }
 
       .title-input {
@@ -738,6 +1037,15 @@
 
       .content {
         font-size: 16px;
+      }
+
+      .event-fields {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .event-extra.show {
+        grid-template-columns: 1fr;
       }
 
       .search {
@@ -786,6 +1094,7 @@
       }
 
       .meta {
+        grid-template-columns: 112px 64px minmax(560px, 1fr) 112px;
         gap: 20px;
         margin-bottom: 18px;
       }
@@ -843,6 +1152,10 @@
     </div>
     <span class="config-status" id="notion-status">未连接</span>
     <button class="config-test" id="testNotionBtn">测试连接</button>
+    <div class="view-tabs">
+      <button class="view-tab active" id="diaryModeBtn" type="button">日记</button>
+      <button class="view-tab" id="eventModeBtn" type="button">⭐ 大事记</button>
+    </div>
     <button class="config-test" onclick="location.href='./index.html'">← 拾光</button>
   </div>
 
@@ -915,6 +1228,26 @@
           placeholder="今天发生了什么，心里在想什么……"
         ></textarea>
 
+        <div class="event-fields">
+          <label class="event-toggle">
+            <input id="eventToggle" type="checkbox" />
+            <span>⭐ 记为人生事件</span>
+          </label>
+          <div class="event-extra" id="eventExtra">
+            <input id="eventTitleInput" type="text" placeholder="人生事件标题（可空）" />
+            <select id="eventTypeInput">
+              <option value="学习">学习</option>
+              <option value="工作">工作</option>
+              <option value="生活">生活</option>
+              <option value="考试">考试</option>
+              <option value="健康">健康</option>
+              <option value="旅行">旅行</option>
+              <option value="纪念">纪念</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+        </div>
+
         <div class="images">
           <div class="images-strip" id="imagesStrip"></div>
           <button class="add-image" id="addImageBtn">＋ 图片</button>
@@ -937,6 +1270,31 @@
         </div>
 
       </div>
+
+      <div class="event-workspace" id="eventWorkspace" style="display: none">
+        <div class="event-toolbar">
+          <div class="event-title">人生事件</div>
+          <div class="event-view-tabs">
+            <button class="event-view-tab active" id="timelineViewBtn" type="button">时间轴</button>
+            <button class="event-view-tab" id="calendarViewBtn" type="button">日历</button>
+          </div>
+        </div>
+
+        <section id="eventTimelineView"></section>
+
+        <section id="eventCalendarView" style="display: none">
+          <div class="event-calendar-head">
+            <button class="event-view-tab" id="eventPrevMonth" type="button">‹</button>
+            <div class="event-calendar-title" id="eventCalendarTitle"></div>
+            <button class="event-view-tab" id="eventNextMonth" type="button">›</button>
+          </div>
+          <div class="event-calendar-weekdays">
+            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+          </div>
+          <div class="event-calendar-grid" id="eventCalendarGrid"></div>
+          <div class="event-day-panel" id="eventDayPanel"></div>
+        </section>
+      </div>
     </main>
 
   </div>
@@ -945,6 +1303,12 @@
 
   <div id="imageOverlay" class="image-overlay" style="display: none">
     <img id="imageOverlayImg" class="image-overlay-img" src="" alt="" />
+  </div>
+
+  <div id="eventDetailOverlay" class="event-detail-overlay" style="display: none" onclick="hideEventDetail(event)">
+    <div class="event-detail-modal" onclick="event.stopPropagation()">
+      <div id="eventDetailBody"></div>
+    </div>
   </div>
 
   <script>
@@ -996,6 +1360,8 @@
 
     // ===== 数据 =====
     let entries = {}
+    let allEntries = []
+    let eventEntries = []
     let currentImages = []
     let newImageFiles = []
 
@@ -1013,6 +1379,9 @@
     let currentYear = today.getFullYear()
     let currentMonth = today.getMonth()
     let selectedDate = formatDate(today)
+    let appMode = 'diary'
+    let eventView = 'timeline'
+    let selectedEventDate = selectedDate
 
     const dateInput = document.getElementById('dateInput')
     const timeInput = document.getElementById('timeInput')
@@ -1026,6 +1395,16 @@
     const saveBtn = document.getElementById('saveBtn')
     const imagesStrip = document.getElementById('imagesStrip')
     const attsStrip = document.getElementById('attsStrip')
+    const eventToggle = document.getElementById('eventToggle')
+    const eventExtra = document.getElementById('eventExtra')
+    const eventTitleInput = document.getElementById('eventTitleInput')
+    const eventTypeInput = document.getElementById('eventTypeInput')
+    const eventWorkspace = document.getElementById('eventWorkspace')
+    const eventTimelineView = document.getElementById('eventTimelineView')
+    const eventCalendarView = document.getElementById('eventCalendarView')
+    const eventCalendarGrid = document.getElementById('eventCalendarGrid')
+    const eventCalendarTitle = document.getElementById('eventCalendarTitle')
+    const eventDayPanel = document.getElementById('eventDayPanel')
 
     function formatDate(date) {
       const y = date.getFullYear()
@@ -1097,6 +1476,11 @@
       return ''
     }
 
+    function checkboxOf(props, key) {
+      const p = props[key]
+      return !!(p && p.checkbox)
+    }
+
     function parseNotionPage(page) {
       const props = page.properties || {}
 
@@ -1139,14 +1523,68 @@
 
       return {
         id: page.id,
+        createdTime: page.created_time || '',
         date,
         time,
         title: textOf(props, '名称'),
         mood: textOf(props, '心情'),
         tags: textOf(props, '标签').split(',').map(t => t.trim()).filter(Boolean),
+        isEvent: checkboxOf(props, '是否大事记') || checkboxOf(props, 'Is Event'),
+        eventTitle: textOf(props, '大事记标题') || textOf(props, 'Event Title'),
+        eventType: textOf(props, '事件类型') || textOf(props, 'Event Type') || '学习',
         images,
         attachments,
       }
+    }
+
+    function isEventPage(entry) {
+      return !!(entry && entry.isEvent && entry.date)
+    }
+
+    function eventDisplayTitle(entry) {
+      return (entry && (entry.eventTitle || entry.title)) || '无题事件'
+    }
+
+    function eventTypeIcon(type) {
+      const icons = {
+        学习: '📚',
+        工作: '💻',
+        生活: '🌿',
+        考试: '📝',
+        健康: '💪',
+        旅行: '✈️',
+        纪念: '⭐',
+        其他: '✨',
+      }
+      return icons[type] || icons['其他']
+    }
+
+    function tagsText(tags) {
+      return (tags || []).map(tag => '#' + tag).join(' · ')
+    }
+
+    function eventDateTimeValue(entry) {
+      return (entry.date || '') + 'T' + (entry.time || '00:00')
+    }
+
+    function buildEventIndexes() {
+      eventEntries = allEntries
+        .filter(isEventPage)
+        .sort((a, b) => eventDateTimeValue(b).localeCompare(eventDateTimeValue(a)))
+    }
+
+    function getEventsForDate(date) {
+      return eventEntries
+        .filter(entry => entry.date === date)
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+    }
+
+    function upsertLocalEntry(entry) {
+      allEntries = allEntries.filter(item => item.id !== entry.id).concat(entry)
+      if (!entries[entry.date] || !entry.isEvent || entries[entry.date].id === entry.id) {
+        entries[entry.date] = entry
+      }
+      buildEventIndexes()
     }
 
     // ===== 正文存为页面 blocks =====
@@ -1223,11 +1661,16 @@
       if (!db) return
       const pages = await fetchAllPages(db)
       const next = {}
+      const parsed = []
       pages.forEach(page => {
         const e = parseNotionPage(page)
-        if (e.date) next[e.date] = e
+        if (!e.date) return
+        parsed.push(e)
+        if (!next[e.date] || (!e.isEvent && next[e.date].isEvent)) next[e.date] = e
       })
+      allEntries = parsed
       entries = next
+      buildEventIndexes()
     }
 
     async function testNotion() {
@@ -1603,8 +2046,252 @@
     document.getElementById('imageOverlay').onclick = hideImageOverlay
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') hideImageOverlay()
+      if (e.key === 'Escape') {
+        hideImageOverlay()
+        hideEventDetail()
+      }
     })
+
+    function renderEventFields() {
+      eventExtra.classList.toggle('show', eventToggle.checked)
+    }
+
+    function setAppMode(mode) {
+      appMode = mode
+      localStorage.setItem('journal_view_mode', mode)
+      const nextHash = mode === 'events' ? '#events' : '#diary'
+      if (location.hash !== nextHash) history.replaceState(null, '', nextHash)
+      document.getElementById('diaryModeBtn').classList.toggle('active', mode === 'diary')
+      document.getElementById('eventModeBtn').classList.toggle('active', mode === 'events')
+      document.querySelector('.editor').style.display = mode === 'diary' ? 'flex' : 'none'
+      eventWorkspace.style.display = mode === 'events' ? 'block' : 'none'
+      renderCalendar()
+      renderEventViews()
+    }
+
+    function setEventView(view) {
+      eventView = view
+      document.getElementById('timelineViewBtn').classList.toggle('active', view === 'timeline')
+      document.getElementById('calendarViewBtn').classList.toggle('active', view === 'calendar')
+      eventTimelineView.style.display = view === 'timeline' ? 'block' : 'none'
+      eventCalendarView.style.display = view === 'calendar' ? 'block' : 'none'
+      renderEventViews()
+    }
+
+    function renderEventViews() {
+      if (appMode !== 'events') return
+      if (eventView === 'timeline') renderEventTimeline()
+      else renderEventCalendar()
+    }
+
+    function renderEventTimeline() {
+      if (!eventEntries.length) {
+        eventTimelineView.innerHTML = '<div class="empty">No events yet.</div>'
+        return
+      }
+
+      let html = ''
+      let currentYearLabel = ''
+      let currentMonthLabel = ''
+
+      eventEntries.forEach(entry => {
+        const year = entry.date.slice(0, 4)
+        const month = entry.date.slice(5, 7)
+        const ym = year + '-' + month
+        if (year !== currentYearLabel) {
+          currentYearLabel = year
+          html += `<h2 class="timeline-year">${year}</h2>`
+          currentMonthLabel = ''
+        }
+        if (ym !== currentMonthLabel) {
+          currentMonthLabel = ym
+          html += `<div class="timeline-month">${month}月</div>`
+        }
+        const tags = tagsText(entry.tags)
+        const meta = `${entry.date.slice(5).replace('-', '.')}${entry.time ? ' · ' + entry.time : ''}${tags ? ' · ' + esc(tags) : ''}`
+        const main = eventDisplayTitle(entry)
+        html += `
+          <div class="timeline-item" onclick="showEventDetail('${entry.id}')">
+            <div class="timeline-date">${meta}</div>
+            <div class="timeline-name">${eventTypeIcon(entry.eventType)} ${esc(main)}</div>
+          </div>`
+      })
+      eventTimelineView.innerHTML = html
+    }
+
+    function renderEventCalendar() {
+      eventCalendarTitle.textContent = `${currentYear} 年 ${String(currentMonth + 1).padStart(2, '0')} 月`
+      eventCalendarGrid.innerHTML = ''
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay()
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+      const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate()
+
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const el = document.createElement('div')
+        el.className = 'event-calendar-day other'
+        el.textContent = prevMonthDays - i
+        eventCalendarGrid.appendChild(el)
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        const dayEvents = getEventsForDate(date)
+        const el = document.createElement('div')
+        el.className = 'event-calendar-day'
+        if (date === selectedEventDate) el.classList.add('selected')
+        const previewEvents = dayEvents.slice(0, 2)
+        const eventItems = previewEvents.length
+          ? `<div class="event-calendar-items">${previewEvents.map(entry => `
+              <div class="event-calendar-item" title="${esc(eventDisplayTitle(entry))}">
+                ${eventTypeIcon(entry.eventType)} ${esc(eventDisplayTitle(entry))}
+              </div>`).join('')}${dayEvents.length > 2 ? `<div class="event-calendar-item">+${dayEvents.length - 2}</div>` : ''}</div>`
+          : ''
+        el.innerHTML = `<div>${day}</div>${eventItems}`
+        el.onclick = () => {
+          selectedEventDate = date
+          renderEventCalendar()
+        }
+        eventCalendarGrid.appendChild(el)
+      }
+
+      renderEventDayPanel(selectedEventDate)
+    }
+
+    function renderEventDayPanel(date) {
+      const dayEvents = getEventsForDate(date)
+      const title = `${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日`
+      const listHTML = dayEvents.length
+        ? `<div class="event-day-list">${dayEvents.map(entry => `
+            <div class="event-day-item" onclick="showEventDetail('${entry.id}')">
+              <div class="entry-date">${entry.date.slice(5).replace('-', '.')}${entry.time ? ' · ' + entry.time : ''}${tagsText(entry.tags) ? ' · ' + esc(tagsText(entry.tags)) : ''}</div>
+              <div class="event-day-item-title">${esc(eventDisplayTitle(entry))}</div>
+            </div>`).join('')}</div>`
+        : '<div class="empty">这天还没有事件。</div>'
+
+      eventDayPanel.innerHTML = `
+        <div class="event-day-panel-head">
+          <div>${title}</div>
+          <button class="event-view-tab" type="button" onclick="openAddEventForm('${date}')">＋ 添加事件</button>
+        </div>
+        ${listHTML}
+        <div class="quick-event-form" id="quickEventForm">
+          <input id="quickEventDate" type="date" value="${date}" />
+          <input id="quickEventTitle" type="text" placeholder="事件标题" />
+          <select id="quickEventType">
+            <option value="学习">学习</option>
+            <option value="工作">工作</option>
+            <option value="生活">生活</option>
+            <option value="考试">考试</option>
+            <option value="健康">健康</option>
+            <option value="旅行">旅行</option>
+            <option value="纪念">纪念</option>
+            <option value="其他">其他</option>
+          </select>
+          <textarea id="quickEventContent" placeholder="备注/正文（可选）"></textarea>
+          <button class="event-view-tab" type="button" onclick="saveEventFromCalendar()">保存事件</button>
+        </div>`
+    }
+
+    function openAddEventForm(date) {
+      selectedEventDate = date
+      const form = document.getElementById('quickEventForm')
+      if (form) {
+        form.classList.add('show')
+        const title = document.getElementById('quickEventTitle')
+        if (title) title.focus()
+      }
+    }
+
+    async function saveEventFromCalendar() {
+      const token = notionToken.value.trim()
+      const db = notionDb.value.trim()
+      if (!token || !db) {
+        showTip('请先配置 Notion')
+        return
+      }
+
+      const date = document.getElementById('quickEventDate').value || selectedEventDate
+      const eventTitle = document.getElementById('quickEventTitle').value.trim()
+      const eventType = document.getElementById('quickEventType').value || '学习'
+      const content = document.getElementById('quickEventContent').value
+      const title = eventTitle || '未命名事件'
+      const properties = {
+        名称: { title: [{ text: { content: title } }] },
+        日期: { date: { start: date } },
+        标签: { multi_select: [{ name: '日记' }] },
+        图片: { files: [] },
+        是否大事记: { checkbox: true },
+        大事记标题: { rich_text: eventTitle ? [{ text: { content: eventTitle } }] : [] },
+        事件类型: { select: { name: eventType } },
+      }
+
+      try {
+        const body = { parent: { database_id: db }, properties }
+        if (content) body.children = contentToBlocks(content)
+        const res = await fetch(PROXY_BASE + '/pages', {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(body),
+        })
+        if (!res.ok) {
+          const err = await res.json()
+          showTip(saveErrorTip(err, res))
+          return
+        }
+        const page = await res.json()
+        upsertLocalEntry({
+          id: page.id,
+          createdTime: page.created_time || '',
+          date,
+          time: '',
+          title,
+          mood: '',
+          content,
+          tags: ['日记'],
+          isEvent: true,
+          eventTitle,
+          eventType,
+          images: [],
+          attachments: [],
+        })
+        selectedEventDate = date
+        showTip('Saved')
+        renderCalendar()
+        renderEventCalendar()
+        renderEventTimeline()
+      } catch (e) {
+        showTip('网络错误')
+      }
+    }
+
+    async function showEventDetail(eventId) {
+      const entry = eventEntries.find(item => item.id === eventId) || allEntries.find(item => item.id === eventId)
+      if (!entry) return
+      let content = entry.content || ''
+      if (entry.id && !content) {
+        try {
+          const blocks = await getBlocks(entry.id)
+          content = blocksToContent(blocks)
+          entry.content = content
+        } catch (e) {}
+      }
+      const images = entry.images && entry.images.length
+        ? `<div class="event-detail-images">${entry.images.map(img => `<img src="${esc(img.url)}" alt="${esc(img.name || '')}" onclick="event.stopPropagation();showImageOverlay('${esc(img.url)}')" />`).join('')}</div>`
+        : ''
+      document.getElementById('eventDetailBody').innerHTML = `
+        <div class="timeline-date">${entry.date}${entry.time ? ' · ' + entry.time : ''}${tagsText(entry.tags) ? ' · ' + esc(tagsText(entry.tags)) : ''}</div>
+        <h2 class="timeline-name">${esc(eventDisplayTitle(entry))}</h2>
+        <div class="timeline-summary">${esc(content || '')}</div>
+        ${images}
+      `
+      document.getElementById('eventDetailOverlay').style.display = 'flex'
+    }
+
+    function hideEventDetail(e) {
+      if (e && e.target !== document.getElementById('eventDetailOverlay')) return
+      document.getElementById('eventDetailOverlay').style.display = 'none'
+    }
 
     // ===== 日历 =====
     function renderCalendar() {
@@ -1644,17 +2331,22 @@
         el.className = 'day'
         el.textContent = day
 
-        if (entries[date]) {
+        if (appMode === 'events' ? getEventsForDate(date).length : entries[date]) {
           el.classList.add('has-entry')
         }
 
-        if (date === selectedDate) {
+        if (date === (appMode === 'events' ? selectedEventDate : selectedDate)) {
           el.classList.add('selected')
         }
 
         el.onclick = () => {
-          selectedDate = date
-          loadEntry(date)
+          if (appMode === 'events') {
+            selectedEventDate = date
+            setEventView('calendar')
+          } else {
+            selectedDate = date
+            loadEntry(date)
+          }
           renderCalendar()
           scrollToEditor()
         }
@@ -1662,7 +2354,8 @@
         calendarDays.appendChild(el)
       }
 
-      renderEntriesList()
+      if (appMode === 'events') renderEventSidebarList()
+      else renderEntriesList()
     }
 
     let loadSeq = 0
@@ -1716,6 +2409,10 @@
           .forEach(btn => btn.classList.remove('active'))
       }
 
+      eventToggle.checked = !!(entry && entry.isEvent)
+      eventTitleInput.value = entry && entry.eventTitle ? entry.eventTitle : ''
+      eventTypeInput.value = entry && entry.eventType ? entry.eventType : '学习'
+      renderEventFields()
       renderImages()
       renderAtts()
       updateWordCount()
@@ -1773,6 +2470,9 @@
       const title = titleInput.value.trim() || '无题'
       const content = contentInput.value
       const tags = getSelectedTags()
+      const isEvent = eventToggle.checked
+      const eventTitle = eventTitleInput.value.trim()
+      const eventType = eventTypeInput.value || '学习'
 
       const startDateTime = timeInput.value ? date + 'T' + timeInput.value + ':00' : date
       const properties = {
@@ -1780,6 +2480,9 @@
         日期: { date: { start: startDateTime } },
         标签: { multi_select: tags.map(t => ({ name: t })) },
         图片: { files: allImages.map(img => ({ name: img.name, external: { url: img.url } })) },
+        是否大事记: { checkbox: isEvent },
+        大事记标题: { rich_text: eventTitle ? [{ text: { content: eventTitle } }] : [] },
+        事件类型: { select: isEvent ? { name: eventType } : null },
       }
       if (mood) properties['心情'] = { select: { name: mood } }
       // 只在有附件时写入「附件」，避免数据库还没有该字段时保存报错
@@ -1831,17 +2534,22 @@
         }
 
         const savedAtts = parseAttProp(page.properties && page.properties['附件'])
-        entries[date] = {
+        const savedEntry = {
           id: page.id,
+          createdTime: page.created_time || '',
           date,
           time: timeInput.value,
           title,
           mood,
           content,
           tags,
+          isEvent,
+          eventTitle,
+          eventType,
           images: allImages,
           attachments: savedAtts,
         }
+        upsertLocalEntry(savedEntry)
         currentImages = allImages.slice()
         newImageFiles = []
         currentAtts = savedAtts.slice()
@@ -1851,6 +2559,7 @@
         selectedDate = date
         showTip('Saved')
         renderCalendar()
+        renderEventViews()
       } catch (e) {
         showTip('网络错误')
       }
@@ -1875,10 +2584,13 @@
           return
         }
         delete entries[date]
+        allEntries = allEntries.filter(item => item.id !== entry.id)
+        buildEventIndexes()
         if (selectedDate === date) {
           loadEntry(date)
         }
         renderCalendar()
+        renderEventViews()
         showTip('已删除')
       } catch (e) {
         showTip('删除失败')
@@ -1886,6 +2598,53 @@
     }
 
     // ===== 条目列表 / 字数 =====
+    function renderEventSidebarList() {
+      const keyword = searchInput.value.trim().toLowerCase()
+      const list = eventEntries
+        .filter(entry => {
+          const date = new Date(entry.date + 'T00:00:00')
+          const sameMonth =
+            date.getFullYear() === currentYear &&
+            date.getMonth() === currentMonth
+          if (!sameMonth) return false
+          if (!keyword) return true
+          return [
+            eventDisplayTitle(entry),
+            entry.title,
+            entry.content,
+            entry.eventType,
+            ...(entry.tags || [])
+          ].join(' ').toLowerCase().includes(keyword)
+        })
+
+      entriesList.innerHTML = ''
+
+      if (!list.length) {
+        entriesList.innerHTML = '<div class="empty">No events this month.</div>'
+        return
+      }
+
+      const wrap = document.createElement('div')
+      wrap.className = 'event-day-list'
+      list.forEach(entry => {
+        const item = document.createElement('div')
+        item.className = 'event-day-item'
+        const tags = tagsText(entry.tags)
+        item.innerHTML = `
+          <div class="entry-date">${entry.date.slice(5).replace('-', '.')}${entry.time ? ' · ' + entry.time : ''}${tags ? ' · ' + esc(tags) : ''}</div>
+          <div class="event-day-item-title">${esc(eventDisplayTitle(entry))}</div>
+        `
+        item.onclick = () => {
+          selectedEventDate = entry.date
+          setEventView('calendar')
+          showEventDetail(entry.id)
+          renderCalendar()
+        }
+        wrap.appendChild(item)
+      })
+      entriesList.appendChild(wrap)
+    }
+
     function renderEntriesList() {
       const keyword = searchInput.value.trim().toLowerCase()
 
@@ -2018,6 +2777,12 @@
       }
     })
 
+    eventToggle.addEventListener('change', renderEventFields)
+    document.getElementById('diaryModeBtn').onclick = () => setAppMode('diary')
+    document.getElementById('eventModeBtn').onclick = () => setAppMode('events')
+    document.getElementById('timelineViewBtn').onclick = () => setEventView('timeline')
+    document.getElementById('calendarViewBtn').onclick = () => setEventView('calendar')
+
     document.getElementById('prevMonth').onclick = () => {
       currentMonth--
 
@@ -2027,6 +2792,7 @@
       }
 
       renderCalendar()
+      renderEventViews()
     }
 
     document.getElementById('nextMonth').onclick = () => {
@@ -2038,11 +2804,35 @@
       }
 
       renderCalendar()
+      renderEventViews()
+    }
+
+    document.getElementById('eventPrevMonth').onclick = () => {
+      currentMonth--
+      if (currentMonth < 0) {
+        currentMonth = 11
+        currentYear--
+      }
+      renderCalendar()
+      renderEventCalendar()
+    }
+
+    document.getElementById('eventNextMonth').onclick = () => {
+      currentMonth++
+      if (currentMonth > 11) {
+        currentMonth = 0
+        currentYear++
+      }
+      renderCalendar()
+      renderEventCalendar()
     }
 
     document.getElementById('saveBtn').onclick = saveEntry
 
-    searchInput.addEventListener('input', renderEntriesList)
+    searchInput.addEventListener('input', () => {
+      if (appMode === 'events') renderEventSidebarList()
+      else renderEntriesList()
+    })
 
     contentInput.addEventListener('input', updateWordCount)
 
@@ -2056,10 +2846,15 @@
 
       loadEntry(selectedDate)
       renderCalendar()
+      renderEventViews()
     })
 
     // ===== 初始化 =====
     loadConfig()
+    renderEventFields()
+    const initialMode = location.hash === '#events' || localStorage.getItem('journal_view_mode') === 'events'
+      ? 'events'
+      : 'diary'
 
     dateInput.value = selectedDate
     timeInput.value = formatTime(today)
@@ -2075,7 +2870,7 @@
         }
       }
       loadEntry(selectedDate)
-      renderCalendar()
+      setAppMode(initialMode)
     })()
   </script>
 </body>
