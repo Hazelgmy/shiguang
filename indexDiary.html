@@ -4002,6 +4002,13 @@
 
     document.getElementById('saveBtn').onclick = saveEntry
 
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        if (appMode === 'diary' && !saveBtn.disabled) saveEntry()
+      }
+    })
+
     searchInput.addEventListener('input', () => {
       if (appMode === 'events') renderEventSidebarList()
       else renderEntriesList()
