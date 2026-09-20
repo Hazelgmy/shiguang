@@ -1201,6 +1201,403 @@
                 }
             }
         </style>
+        <style id="blue-white-theme">
+            :root {
+                --ui-bg: #f3f8ff;
+                --ui-surface: rgba(255, 255, 255, 0.9);
+                --ui-surface-strong: #ffffff;
+                --ui-primary: #377cf6;
+                --ui-primary-hover: #286ce2;
+                --ui-primary-soft: #eaf2ff;
+                --ui-text: #17345f;
+                --ui-muted: #7589aa;
+                --ui-line: #dce9fb;
+                --ui-shadow: 0 14px 38px rgba(64, 121, 211, 0.11);
+                --bg: var(--ui-bg);
+                --card: var(--ui-surface);
+                --card2: var(--ui-primary-soft);
+                --text: var(--ui-text);
+                --text-muted: var(--ui-muted);
+                --accent: var(--ui-primary);
+                --accent-light: #a8c7fb;
+                --border: var(--ui-line);
+                --border-mid: #c9dcf7;
+                --shadow: rgba(64, 121, 211, 0.1);
+            }
+
+            body {
+                background:
+                    radial-gradient(circle at 8% 12%, rgba(105, 166, 255, 0.18), transparent 25%),
+                    radial-gradient(circle at 92% 88%, rgba(121, 175, 255, 0.16), transparent 28%),
+                    linear-gradient(135deg, #f8fbff 0%, var(--ui-bg) 55%, #eef5ff 100%);
+                color: var(--ui-text);
+                font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+            }
+
+            ::-webkit-scrollbar { width: 3px; height: 3px; }
+            ::-webkit-scrollbar-button,
+            ::-webkit-scrollbar-button:single-button {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+                background: transparent !important;
+                -webkit-appearance: none;
+            }
+            ::-webkit-scrollbar-thumb { background: #b8cdf0; border-radius: 999px; }
+            ::-webkit-scrollbar-thumb:hover { background: #8aade4; }
+
+            #lock-screen {
+                background:
+                    radial-gradient(circle at 20% 18%, rgba(83, 145, 247, 0.2), transparent 27%),
+                    radial-gradient(circle at 78% 76%, rgba(125, 181, 255, 0.2), transparent 25%),
+                    #f4f8ff;
+            }
+
+            .lock-card {
+                background: rgba(255, 255, 255, 0.9);
+                border-color: var(--ui-line);
+                box-shadow: 0 22px 70px rgba(65, 120, 205, 0.16);
+            }
+
+            .lock-title { color: var(--ui-text); }
+            .lock-sub { color: var(--ui-muted); }
+            .lock-input { background: #f9fbff; border-color: var(--ui-line); color: var(--ui-text); }
+            .lock-input:focus { border-color: var(--ui-primary); box-shadow: 0 0 0 4px rgba(55, 124, 246, 0.1); }
+            .lock-btn { background: var(--ui-primary); box-shadow: 0 10px 24px rgba(55, 124, 246, 0.22); }
+            .lock-btn:hover { background: var(--ui-primary-hover); }
+
+            #app { min-height: 100dvh; }
+
+            .header {
+                min-height: 60px;
+                padding: 10px 24px;
+                background: rgba(255, 255, 255, 0.76);
+                border-color: var(--ui-line);
+                backdrop-filter: blur(18px);
+                box-shadow: 0 6px 24px rgba(64, 121, 211, 0.06);
+            }
+
+            .header-title {
+                color: var(--ui-text);
+                font-size: 26px;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+            }
+
+            .header-actions { gap: 10px; }
+
+            .lock-exit,
+            .config-toggle {
+                min-height: 34px;
+                padding: 5px 14px;
+                border: 1px solid var(--ui-line);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.84);
+                color: var(--ui-text);
+                box-shadow: 0 5px 16px rgba(64, 121, 211, 0.06);
+            }
+
+            .lock-exit:hover,
+            .config-toggle:hover {
+                background: var(--ui-primary-soft);
+                color: var(--ui-primary);
+            }
+
+            .config-bar {
+                padding: 7px 24px;
+                gap: 12px;
+                background: rgba(255, 255, 255, 0.68);
+                border-color: var(--ui-line);
+                backdrop-filter: blur(16px);
+            }
+
+            .config-input,
+            .config-input-narrow,
+            .book-input,
+            .book-status-select,
+            .search-input,
+            .card-edit-input,
+            .card-edit-select,
+            .card-edit-textarea {
+                border-color: var(--ui-line);
+                background: rgba(249, 252, 255, 0.95);
+                color: var(--ui-text);
+                border-radius: 12px;
+            }
+
+            .config-input:focus,
+            .config-input-narrow:focus,
+            .book-input:focus,
+            .book-status-select:focus,
+            .search-input:focus,
+            .card-edit-input:focus,
+            .card-edit-select:focus,
+            .card-edit-textarea:focus {
+                border-color: var(--ui-primary);
+                box-shadow: 0 0 0 3px rgba(55, 124, 246, 0.09);
+            }
+
+            .config-status.ok { color: #35a768; }
+
+            .main-content {
+                max-width: 1200px;
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .tabs,
+            .filter-tabs { gap: 8px; }
+
+            .tabs { margin-bottom: 12px; }
+
+            .tab,
+            .filter-btn {
+                min-height: 34px;
+                padding: 5px 14px;
+                border: 1px solid var(--ui-line);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.86);
+                color: var(--ui-muted);
+                box-shadow: 0 5px 16px rgba(64, 121, 211, 0.05);
+            }
+
+            .tab:hover,
+            .filter-btn:hover {
+                background: var(--ui-primary-soft);
+                color: var(--ui-primary);
+            }
+
+            .tab.active,
+            .filter-btn.active,
+            .save-btn,
+            .card-edit-save {
+                background: linear-gradient(135deg, #68a5ff, var(--ui-primary));
+                color: #fff;
+                border-color: transparent;
+                box-shadow: 0 9px 22px rgba(55, 124, 246, 0.2);
+            }
+
+            .write-card {
+                margin-bottom: 12px;
+                padding: 1.4rem;
+                border: 1px solid var(--ui-line);
+                border-radius: 16px;
+                background: var(--ui-surface);
+                box-shadow: var(--ui-shadow);
+                backdrop-filter: blur(14px);
+            }
+
+            .write-type-label {
+                margin-bottom: 10px;
+                color: var(--ui-text);
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .write-textarea {
+                min-height: 110px;
+                padding: .9rem 1rem;
+                border: 1px solid var(--ui-line);
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.82);
+                color: var(--ui-text);
+                line-height: 1.75;
+            }
+
+            .write-textarea:focus {
+                border-color: var(--ui-primary);
+                box-shadow: 0 0 0 4px rgba(55, 124, 246, 0.08);
+            }
+
+            .write-actions { gap: 8px; margin-top: 10px; }
+
+            .img-upload-btn,
+            .detail-btn,
+            .card-edit-cancel {
+                min-height: 34px;
+                padding: 5px 14px;
+                border-color: var(--ui-line);
+                border-radius: 999px;
+                background: #fff;
+                color: var(--ui-muted);
+            }
+
+            .save-btn {
+                min-width: 112px;
+                min-height: 36px;
+                padding: 5px 18px;
+                justify-content: center;
+                border-radius: 999px;
+            }
+
+            .divider { margin: 10px 0 12px; border-top: 1px solid var(--ui-line); }
+
+            .history-header {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+            .search-wrap { flex: 0 1 320px; min-width: 220px; margin: 0; }
+
+            .search-input {
+                min-height: 36px;
+                padding: .45rem 2.2rem .45rem 1rem;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 1rem;
+            }
+
+            .note-card {
+                min-height: 0;
+                padding: 1.1rem 1.2rem;
+                border: 1px solid var(--ui-line);
+                border-radius: 14px;
+                background: var(--ui-surface);
+                box-shadow: 0 10px 28px rgba(64, 121, 211, 0.08);
+                backdrop-filter: blur(12px);
+            }
+
+            .note-card:hover {
+                border-color: #c5daf9;
+                box-shadow: 0 16px 36px rgba(64, 121, 211, 0.13);
+            }
+
+            .note-type-badge,
+            .book-status-tag {
+                background: var(--ui-primary-soft);
+                color: var(--ui-primary);
+                border-radius: 999px;
+            }
+
+            .note-content { color: var(--ui-text); line-height: 1.75; }
+            .note-date, .note-insight, .save-status { color: var(--ui-muted); }
+            .note-image-thumb, .img-preview-item { border-color: var(--ui-line); border-radius: 14px; }
+
+            .detail-overlay { background: rgba(23, 52, 95, 0.34); backdrop-filter: blur(8px); }
+            .detail-modal {
+                background: #f9fbff;
+                border: 1px solid var(--ui-line);
+                border-radius: 24px;
+                box-shadow: 0 24px 70px rgba(23, 52, 95, 0.22);
+            }
+            .detail-modal-header { border-color: var(--ui-line); }
+
+            .back-to-top {
+                border-color: var(--ui-line);
+                background: #fff;
+                color: var(--ui-primary);
+                box-shadow: var(--ui-shadow);
+            }
+
+            @media (max-width: 1100px) {
+                .header, .config-bar { padding-left: 20px; padding-right: 20px; }
+                .main-content { padding-left: 20px; padding-right: 20px; }
+                .cards-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+            }
+
+            @media (max-width: 768px) {
+                .header,
+                .config-bar { padding-left: 16px; padding-right: 16px; }
+                .header { min-height: auto; align-items: flex-start; gap: 12px; }
+                .header-title { font-size: 22px; }
+                .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+                .lock-exit { min-height: 36px; padding: 7px 12px; }
+                .main-content { padding: 18px 14px 48px; }
+                .tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
+                .tab { flex: 0 0 auto; }
+                .write-card { padding: 18px; border-radius: 18px; }
+                .write-textarea { min-height: 120px; }
+                .history-header { align-items: stretch; flex-direction: column; }
+                .filter-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+                .filter-btn { flex: 0 0 auto; }
+                .search-wrap { width: 100%; }
+                .cards-grid { grid-template-columns: 1fr; }
+                .note-card { min-height: auto; }
+            }
+        </style>
+        <style id="paper-theme">
+            html[data-theme="paper"] {
+                --ui-bg: #f7f3ee;
+                --ui-surface: #efe9df;
+                --ui-surface-strong: #f7f3ee;
+                --ui-primary: #8b7355;
+                --ui-primary-hover: #6f5b43;
+                --ui-primary-soft: #e8e0d3;
+                --ui-text: #5c4e38;
+                --ui-muted: #9a876b;
+                --ui-line: rgba(139, 115, 85, 0.22);
+                --ui-shadow: none;
+            }
+
+            html[data-theme="paper"] body {
+                background: #f7f3ee;
+                color: var(--ui-text);
+            }
+
+            html[data-theme="blue"],
+            html[data-theme="blue"] * { scrollbar-color: #b8cdf0 transparent; }
+
+            html[data-theme="paper"],
+            html[data-theme="paper"] * { scrollbar-color: #b9aa91 #e8e0d3; }
+
+            html[data-theme="paper"] ::-webkit-scrollbar-track { background: #e8e0d3 !important; }
+            html[data-theme="paper"] ::-webkit-scrollbar-thumb { background: #b9aa91 !important; }
+            html[data-theme="paper"] ::-webkit-scrollbar-thumb:hover { background: #8b7355 !important; }
+
+            html[data-theme="paper"] .header {
+                background: #f7f3ee;
+                box-shadow: none;
+                backdrop-filter: none;
+            }
+
+            html[data-theme="paper"] .config-bar {
+                background: #efe9df;
+                box-shadow: none;
+                backdrop-filter: none;
+            }
+
+            html[data-theme="paper"] .write-card,
+            html[data-theme="paper"] .note-card {
+                background: var(--ui-surface);
+                box-shadow: var(--ui-shadow);
+                backdrop-filter: none;
+            }
+
+            html[data-theme="paper"] .config-input,
+            html[data-theme="paper"] .config-input-narrow,
+            html[data-theme="paper"] .book-input,
+            html[data-theme="paper"] .book-status-select,
+            html[data-theme="paper"] .search-input,
+            html[data-theme="paper"] .write-textarea,
+            html[data-theme="paper"] .tab,
+            html[data-theme="paper"] .filter-btn,
+            html[data-theme="paper"] .lock-exit,
+            html[data-theme="paper"] .config-toggle {
+                background: #f7f3ee;
+            }
+
+            html[data-theme="paper"] .tab.active,
+            html[data-theme="paper"] .filter-btn.active,
+            html[data-theme="paper"] .save-btn,
+            html[data-theme="paper"] .card-edit-save {
+                background: #8b7355;
+                box-shadow: none;
+            }
+
+            html[data-theme="paper"] .tab:hover,
+            html[data-theme="paper"] .filter-btn:hover,
+            html[data-theme="paper"] .lock-exit:hover,
+            html[data-theme="paper"] .config-toggle:hover {
+                background: var(--ui-primary-soft);
+                color: var(--ui-primary);
+            }
+        </style>
     </head>
     <body>
         <!-- ===== 密码锁 ===== -->
@@ -1239,6 +1636,7 @@
                 <div class="header-actions">
                     <button class="lock-exit" onclick="location.href='./indexDiary.html'">📓 日记</button>
                     <button class="lock-exit" onclick="location.href='./indexDiary.html#events'">⭐ 大事记</button>
+                    <button class="lock-exit theme-toggle" type="button" onclick="toggleTheme()" title="切换米白主题">◐</button>
                     <button class="lock-exit" onclick="lockApp()">🔒 锁定</button>
                 </div>
             </header>
@@ -1329,11 +1727,10 @@
                         <button class="filter-btn" data-filter="开心" onclick="setFilter(this)">🌸</button>
                         <button class="filter-btn" data-filter="书单" onclick="setFilter(this)">📚</button>
                     </div>
-                </div>
-
-                <div class="search-wrap">
-                    <input class="search-input" id="search-input" type="text" placeholder="搜索内容或感悟… 🔍" />
-                    <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+                    <div class="search-wrap">
+                        <input class="search-input" id="search-input" type="text" placeholder="搜索内容或感悟… 🔍" />
+                        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+                    </div>
                 </div>
 
                 <div id="cards-area">
@@ -1362,6 +1759,25 @@
         <button id="back-to-top" class="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
 
         <script>
+            const THEME_STORAGE_KEY = "shiguang_theme";
+
+            function setTheme(theme) {
+                const next = theme === "paper" ? "paper" : "blue";
+                document.documentElement.dataset.theme = next;
+                document.querySelectorAll(".theme-toggle").forEach((button) => {
+                    button.textContent = next === "paper" ? "☀" : "◐";
+                    button.title = next === "paper" ? "切换蓝白主题" : "切换米白主题";
+                });
+            }
+
+            function toggleTheme() {
+                const next = document.documentElement.dataset.theme === "paper" ? "blue" : "paper";
+                localStorage.setItem(THEME_STORAGE_KEY, next);
+                setTheme(next);
+            }
+
+            setTheme(localStorage.getItem(THEME_STORAGE_KEY) || "blue");
+
             // ===== 密码（可改）=====
             const CORRECT_PWD = "1234";
             const DIARY_PWD = "0000";
