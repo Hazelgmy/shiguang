@@ -1246,10 +1246,12 @@
     }
 
     .app {
+      --workspace-height: calc(100dvh - 92px);
       min-height: calc(100dvh - 68px);
       grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(180px, 220px);
-      gap: 20px;
-      padding: 20px 28px 8px;
+      gap: 12px;
+      padding: 16px 18px 8px;
+      align-items: stretch;
     }
 
     .sidebar,
@@ -1264,13 +1266,13 @@
 
     .insights-panel {
       min-width: 0;
-      height: calc(100dvh - 96px);
-      max-height: calc(100dvh - 96px);
+      height: var(--workspace-height);
+      max-height: var(--workspace-height);
       display: flex;
       flex-direction: column;
       gap: 10px;
       overflow-y: auto;
-      padding-right: 2px;
+      padding-right: 0;
     }
 
     .insight-card {
@@ -1436,8 +1438,10 @@
 
     .sidebar {
       min-height: 0;
+      height: var(--workspace-height);
       padding: 28px 24px;
       border-right: 1px solid var(--ui-line);
+      overflow-y: auto;
     }
 
     .search {
@@ -1505,12 +1509,19 @@
     .main {
       min-width: 0;
       min-height: 0;
+      height: var(--workspace-height);
       padding: 0;
+      overflow: auto;
+    }
+
+    .app.events-mode .main {
+      overflow: hidden;
     }
 
     .editor {
       max-width: none;
-      min-height: calc(100dvh - 96px);
+      min-height: 100%;
+      height: 100%;
       margin: 0;
       padding: 30px 42px;
     }
@@ -1585,7 +1596,7 @@
     }
 
     .event-fields {
-      margin: 28px 0 0;
+      margin: 0;
       padding: 16px 0;
       border-color: var(--ui-line);
     }
@@ -1658,14 +1669,26 @@
 
     .event-workspace {
       max-width: none;
-      min-height: calc(100dvh - 96px);
-      height: auto;
+      min-height: 100%;
+      height: 100%;
       margin: 0;
       padding: 30px 36px;
-      overflow: visible;
+      overflow: hidden;
+      flex-direction: column;
     }
 
-    .event-toolbar { margin-bottom: 22px; }
+    .event-toolbar {
+      flex: 0 0 auto;
+      margin-bottom: 22px;
+    }
+
+    #eventTimelineView,
+    #eventCalendarView {
+      min-height: 0;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
     .event-title {
       display: flex;
       align-items: center;
@@ -1825,7 +1848,10 @@
       .main {
         overflow-x: hidden;
         overflow-y: auto;
-        scrollbar-gutter: stable;
+      }
+
+      .app.events-mode .main {
+        overflow-y: hidden;
       }
 
       .editor {
@@ -1834,7 +1860,7 @@
     }
 
     @media (max-width: 1280px) {
-      .app { grid-template-columns: 300px minmax(0, 1fr) 200px; padding: 16px 16px 8px; gap: 16px; }
+      .app { grid-template-columns: 300px minmax(0, 1fr) 200px; padding: 14px 12px 8px; gap: 10px; }
       .editor, .event-workspace { padding-left: 28px; padding-right: 28px; }
       .meta { grid-template-columns: 122px 66px minmax(330px, 1fr) 112px; gap: 10px; }
       .mood-label { display: none; }
@@ -1881,20 +1907,20 @@
   </style>
   <style id="paper-theme">
     html[data-theme="paper"] {
-      --ui-bg: #f7f4ee;
-      --ui-surface: rgba(255, 255, 255, 0.18);
-      --ui-surface-strong: #fbf9f4;
+      --ui-bg: #fbf7ef;
+      --ui-surface: #fbf7ef;
+      --ui-surface-strong: #fffaf3;
       --ui-primary: #4d4943;
       --ui-primary-hover: #403b35;
-      --ui-primary-soft: #eee9e0;
+      --ui-primary-soft: #e4d8c7;
       --ui-text: #403b35;
       --ui-muted: #9b9387;
-      --ui-line: #ded8cd;
+      --ui-line: #d4c8b7;
       --ui-shadow: none;
     }
 
     html[data-theme="paper"] body {
-      background: #f7f4ee;
+      background: var(--ui-bg);
       color: var(--ui-text);
     }
 
@@ -1908,22 +1934,66 @@
     html[data-theme="paper"] ::-webkit-scrollbar-thumb { background: rgba(155, 147, 135, 0.42) !important; }
     html[data-theme="paper"] ::-webkit-scrollbar-thumb:hover { background: rgba(155, 147, 135, 0.7) !important; }
 
-    html[data-theme="paper"] .config-bar {
-      background: #f7f4ee;
+    html[data-theme="blue"] .app {
+      --workspace-height: calc(100dvh - 58px);
+      gap: 0;
+      padding: 0 12px 0 0;
+    }
+
+    html[data-theme="blue"] .sidebar,
+    html[data-theme="blue"] .editor,
+    html[data-theme="blue"] .event-workspace {
+      border-color: transparent;
+      border-radius: 0;
       box-shadow: none;
       backdrop-filter: none;
     }
 
+    html[data-theme="blue"] .editor,
+    html[data-theme="paper"] .editor {
+      height: 100%;
+      min-height: 0;
+    }
+
+    html[data-theme="blue"] .content,
+    html[data-theme="paper"] .content {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    html[data-theme="paper"] .config-bar {
+      background: #fbf7ef;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    html[data-theme="paper"] .app {
+      --workspace-height: calc(100dvh - 58px);
+      gap: 0;
+      padding: 0 12px 0 0;
+    }
+
     html[data-theme="paper"] .sidebar {
-      background: var(--ui-surface);
+      background: #f2eadf;
+      border-color: transparent;
+      border-radius: 0;
       box-shadow: none;
       backdrop-filter: none;
     }
 
     html[data-theme="paper"] .editor,
-    html[data-theme="paper"] .event-workspace,
+    html[data-theme="paper"] .event-workspace {
+      background: #fbf7ef;
+      border-color: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
     html[data-theme="paper"] .insight-card {
-      background: transparent;
+      background: #fffaf3;
       box-shadow: none;
       backdrop-filter: none;
     }
@@ -1937,7 +2007,7 @@
     html[data-theme="paper"] .quick-event-form textarea,
     html[data-theme="paper"] .tag-option,
     html[data-theme="paper"] .event-day-item {
-      background: transparent;
+      background: #fffaf3;
     }
 
     html[data-theme="paper"] .event-detail-modal { background: #fbf9f4; }
@@ -2023,7 +2093,102 @@
       background: var(--ui-primary-soft);
       border-color: var(--ui-line);
     }
-  </style>
+  
+    /* ===== 桌面端：整页固定一屏，不让“大页面”上下滚动 ===== */
+    @media (min-width: 901px) {
+      html,
+      body {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .config-bar {
+        flex: 0 0 auto;
+      }
+
+      .app,
+      html[data-theme="paper"] .app {
+        --workspace-height: 100%;
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .sidebar,
+      .main,
+      .insights-panel {
+        height: 100%;
+        max-height: 100%;
+        min-height: 0;
+      }
+
+      /* 左右栏需要时各自滚，不再撑高整个页面 */
+      .sidebar,
+      .insights-panel {
+        overflow-y: auto;
+      }
+
+      /* 中间“大页面”本身不出现上下滚动条 */
+      .main {
+        overflow: hidden;
+      }
+
+      .editor,
+      html[data-theme="paper"] .editor {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .meta,
+      .title-input,
+      .event-fields,
+      .editor-tools {
+        flex: 0 0 auto;
+      }
+
+      /* 正文自动占满标题和底部工具之间的全部剩余空间 */
+      .content,
+      html[data-theme="paper"] .content {
+        flex: 1 1 auto;
+        width: 100%;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow-y: auto;
+        resize: none;
+      }
+
+  .content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--soft) transparent;
+}
+
+.content::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--soft);
+  border-radius: 10px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+    }
+
+</style>
 </head>
 
 <body>
@@ -3162,8 +3327,9 @@
       if (location.hash !== nextHash) history.replaceState(null, '', nextHash)
       document.getElementById('diaryModeBtn').classList.toggle('active', mode === 'diary')
       document.getElementById('eventModeBtn').classList.toggle('active', mode === 'events')
+      document.querySelector('.app').classList.toggle('events-mode', mode === 'events')
       document.querySelector('.editor').style.display = mode === 'diary' ? 'flex' : 'none'
-      eventWorkspace.style.display = mode === 'events' ? 'block' : 'none'
+      eventWorkspace.style.display = mode === 'events' ? 'flex' : 'none'
       renderCalendar()
       renderEventViews()
     }
@@ -3586,6 +3752,7 @@
       renderImages()
       renderAtts()
       updateWordCount()
+      resizeContentInput()
       renderInsights()
     }
 
@@ -3904,6 +4071,19 @@
     function updateWordCount() {
       wordCount.textContent =
         `${contentInput.value.trim().length} 字`
+      resizeContentInput()
+    }
+
+    function resizeContentInput() {
+      // 桌面端由 flex 自动分配正文高度，避免把整个页面向下撑出滚动条。
+      if (window.matchMedia('(min-width: 901px)').matches) {
+        contentInput.style.height = ''
+        return
+      }
+
+      // 小屏仍按内容自动展开，方便正常页面滚动。
+      contentInput.style.height = 'auto'
+      contentInput.style.height = `${contentInput.scrollHeight}px`
     }
 
     function showTip(text) {
@@ -4014,7 +4194,11 @@
       else renderEntriesList()
     })
 
-    contentInput.addEventListener('input', updateWordCount)
+    contentInput.addEventListener('input', () => {
+      updateWordCount()
+      resizeContentInput()
+    })
+    window.addEventListener('resize', resizeContentInput)
 
     dateInput.addEventListener('change', () => {
       selectedDate = dateInput.value
