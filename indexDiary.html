@@ -2508,6 +2508,15 @@
       ).padStart(2, '0')}`
     }
 
+    function timezoneOffset() {
+      const offset = -new Date().getTimezoneOffset()
+      const sign = offset >= 0 ? '+' : '-'
+      const abs = Math.abs(offset)
+      return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(
+        abs % 60
+      ).padStart(2, '0')}`
+    }
+
     const MOOD_EMOJI = {
       开心: '😄',
       思考: '🤔',
@@ -3812,7 +3821,9 @@
       const eventTitle = eventTitleInput.value.trim()
       const eventType = eventTypeInput.value || '学习'
 
-      const startDateTime = timeInput.value ? date + 'T' + timeInput.value + ':00' : date
+      const startDateTime = timeInput.value
+        ? date + 'T' + timeInput.value + ':00' + timezoneOffset()
+        : date
       const properties = {
         名称: { title: [{ text: { content: title } }] },
         日期: { date: { start: startDateTime } },

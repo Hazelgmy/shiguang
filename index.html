@@ -2454,6 +2454,11 @@
             }
 
             document.addEventListener("keydown", (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+                    e.preventDefault();
+                    saveNote();
+                    return;
+                }
                 if (e.key === "Escape") {
                     hideImageOverlay();
                     hideDetail();
