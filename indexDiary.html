@@ -509,6 +509,127 @@
       color: #bdb5a9;
     }
 
+    /* ===== Markdown 预览 ===== */
+    .md-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin: 0 0 4px;
+    }
+
+    .md-toggle {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 4px 14px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .md-toggle:hover {
+      color: var(--text);
+      border-color: var(--soft);
+    }
+
+    .md-toggle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .md-preview {
+      overflow-wrap: anywhere;
+    }
+
+    .md-preview > :first-child { margin-top: 0; }
+    .md-preview > :last-child { margin-bottom: 0; }
+
+    .md-preview p { margin: 0 0 0.6em; }
+    .md-preview p.md-blank { display: none; }
+
+    .md-preview h1,
+    .md-preview h2,
+    .md-preview h3 {
+      line-height: 1.5;
+      font-weight: 600;
+      margin: 0.9em 0 0.35em;
+    }
+    .md-preview h1 { font-size: 1.5em; }
+    .md-preview h2 { font-size: 1.3em; }
+    .md-preview h3 { font-size: 1.12em; }
+
+    .md-preview ul,
+    .md-preview ol {
+      margin: 0 0 0.6em;
+      padding-left: 1.4em;
+    }
+    .md-preview li { margin: 0.15em 0; }
+
+    .md-preview blockquote {
+      margin: 0.4em 0 0.6em;
+      padding: 0.1em 0 0.1em 14px;
+      border-left: 3px solid var(--line);
+      color: var(--muted);
+    }
+
+    .md-preview hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 1.1em 0;
+    }
+
+    .md-preview code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.86em;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    .md-preview pre {
+      margin: 0.5em 0 0.8em;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.045);
+      border-radius: 10px;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+
+    .md-preview pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 0.82em;
+    }
+
+    .md-preview .md-todo {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0.15em 0;
+    }
+
+    .md-preview .md-todo input {
+      flex: 0 0 auto;
+      margin: 0.6em 0 0;
+    }
+
+    .md-preview .md-todo.done {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .md-preview a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .md-preview .md-empty {
+      color: var(--muted);
+    }
+
     .event-fields {
       margin: -14px 0 24px;
       border-top: 1px solid var(--line);
@@ -2286,11 +2407,17 @@
           placeholder="给今天取个名字……"
         />
 
+        <div class="md-bar">
+          <button id="mdPreviewBtn" class="md-toggle" type="button">👁 预览</button>
+        </div>
+
         <textarea
           id="contentInput"
           class="content"
-          placeholder="今天发生了什么，心里在想什么……"
+          placeholder="今天发生了什么，心里在想什么……&#10;支持 Markdown：# 标题　- 列表　&gt; 引用　**加粗**　``` 代码块"
         ></textarea>
+
+        <div id="mdPreviewBox" class="content md-preview" hidden></div>
 
         <div class="event-fields">
           <label class="event-toggle">
@@ -2858,25 +2985,398 @@
       renderInsights()
     }
 
-    // ===== 正文存为页面 blocks =====
+    // ===== 正文存为页面 blocks（Markdown ⇄ Notion 块双向转换） =====
+    // 写日记时可以直接使用 Markdown：
+    //   # ## ###      标题        - 或 *       无序列表
+    //   1.            有序列表    >            引用
+    //   - [ ] / - [x] 待办        ``` 代码块     --- 分隔线
+    //   **粗体** *斜体* `行内代码` ~~删除线~~ [文字](链接)
+
+    // Markdown 语言名 → Notion code block 支持的枚举值（无法识别时回落 plain text）
+    const MD_LANG_MAP = {
+      js: 'javascript', javascript: 'javascript', ts: 'typescript', typescript: 'typescript',
+      py: 'python', python: 'python', md: 'markdown', markdown: 'markdown',
+      json: 'json', html: 'html', css: 'css', scss: 'scss',
+      sh: 'shell', bash: 'shell', shell: 'shell', zsh: 'shell',
+      sql: 'sql', java: 'java', c: 'c', cpp: 'c++', 'c++': 'c++',
+      cs: 'c#', 'c#': 'c#', go: 'go', rust: 'rust', rs: 'rust',
+      php: 'php', ruby: 'ruby', rb: 'ruby', yml: 'yaml', yaml: 'yaml',
+      xml: 'xml', diff: 'diff', text: 'plain text', txt: 'plain text', plaintext: 'plain text',
+    }
+
+    function mdToNotionLang(lang) {
+      if (!lang) return 'plain text'
+      return MD_LANG_MAP[String(lang).toLowerCase()] || 'plain text'
+    }
+
+    // Notion rich_text 单个元素上限 2000 字符，超长需切分
+    function splitRichText(text) {
+      const out = []
+      const s = text == null ? '' : String(text)
+      for (let i = 0; i < s.length; i += 2000) {
+        out.push({ type: 'text', text: { content: s.slice(i, i + 2000) } })
+      }
+      return out
+    }
+
+    // 链接协议白名单：拦掉 javascript: / data: / vbscript: 等可执行协议，
+    // 否则粘贴进来的 [文字](javascript:...) 在预览里点一下就能跑脚本并读到本地 Token
+    function safeHttpUrl(url) {
+      const u = String(url == null ? '' : url).trim()
+      if (!u) return ''
+      // 有协议头时只放行 http / https / mailto / tel，其余一律丢弃
+      if (/^[a-z][a-z0-9+.-]*:/i.test(u)) {
+        return /^(https?|mailto|tel):/i.test(u) ? u : ''
+      }
+      return u
+    }
+
+    // 行内 Markdown → rich_text 数组
+    // 只识别 * 号变体（不识别 _ 号），避免 snake_case_name 被误判成斜体
+    const INLINE_MD_RE = new RegExp([
+      '(\\*{3})([^\\s*](?:[\\s\\S]*?[^\\s*])?)\\1',
+      '(\\*{2})([^\\s*](?:[\\s\\S]*?[^\\s*])?)\\3',
+      '(\\*)([^\\s*](?:[\\s\\S]*?[^\\s*])?)\\5',
+      '~~(\\S(?:[\\s\\S]*?\\S)?)~~',
+      '`([^`]+)`',
+      '\\[([^\\]]*)\\]\\(((?:[^()\\s]|\\([^()\\s]*\\))+)\\)',
+    ].join('|'), 'g')
+
+    function mdInlineToRichText(text) {
+      const s = text == null ? '' : String(text)
+      if (!s) return []
+      const out = []
+      const push = (str, annotations, link) => {
+        if (!str) return
+        splitRichText(str).forEach(item => {
+          if (link) item.text.link = { url: link }
+          if (annotations) item.annotations = annotations
+          out.push(item)
+        })
+      }
+      let last = 0
+      let m
+      INLINE_MD_RE.lastIndex = 0
+      while ((m = INLINE_MD_RE.exec(s)) !== null) {
+        if (m.index > last) push(s.slice(last, m.index))
+        if (m[2] !== undefined) push(m[2], { bold: true, italic: true })
+        else if (m[4] !== undefined) push(m[4], { bold: true })
+        else if (m[6] !== undefined) push(m[6], { italic: true })
+        else if (m[7] !== undefined) push(m[7], { strikethrough: true })
+        else if (m[8] !== undefined) push(m[8], { code: true })
+        else if (m[9] !== undefined) push(m[9], undefined, safeHttpUrl(m[10]))
+        last = INLINE_MD_RE.lastIndex
+      }
+      if (last < s.length) push(s.slice(last))
+      return out
+    }
+
+    // 单行 Markdown → 一个 Notion block
+    function mdLineToBlock(line) {
+      // 分隔线
+      if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+        return { object: 'block', type: 'divider', divider: {} }
+      }
+      // 标题（#### 及以上降级为 heading_3，Notion 只支持三级）
+      let m = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/)
+      if (m) {
+        const type = 'heading_' + Math.min(m[1].length, 3)
+        const blk = { object: 'block', type }
+        blk[type] = { rich_text: mdInlineToRichText(m[2].trim()) }
+        return blk
+      }
+      // 待办事项
+      m = line.match(/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/)
+      if (m) {
+        return {
+          object: 'block',
+          type: 'to_do',
+          to_do: { rich_text: mdInlineToRichText(m[2]), checked: m[1].toLowerCase() === 'x' },
+        }
+      }
+      // 无序列表（带缩进的嵌套项会拍平成同级，避免读回时丢内容）
+      m = line.match(/^\s*[-*+]\s+(.*)$/)
+      if (m) {
+        return { object: 'block', type: 'bulleted_list_item', bulleted_list_item: { rich_text: mdInlineToRichText(m[1]) } }
+      }
+      // 有序列表
+      m = line.match(/^\s*\d+[.)]\s+(.*)$/)
+      if (m) {
+        return { object: 'block', type: 'numbered_list_item', numbered_list_item: { rich_text: mdInlineToRichText(m[1]) } }
+      }
+      // 引用
+      m = line.match(/^\s*>\s?(.*)$/)
+      if (m) {
+        return { object: 'block', type: 'quote', quote: { rich_text: mdInlineToRichText(m[1]) } }
+      }
+      // 普通段落（空行同样生成空段落，保持与旧版一致的行距）
+      return { object: 'block', type: 'paragraph', paragraph: { rich_text: mdInlineToRichText(line) } }
+    }
+
     function contentToBlocks(content) {
       if (!content) return []
-      return content.split('\n').map(line => {
-        const rich_text = []
-        if (line) {
-          for (let i = 0; i < line.length; i += 2000) {
-            rich_text.push({ type: 'text', text: { content: line.slice(i, i + 2000) } })
+      const lines = String(content).split('\n')
+      const blocks = []
+      let i = 0
+      while (i < lines.length) {
+        // 代码围栏 ``` 或 ~~~
+        const fence = lines[i].match(/^\s*(`{3,}|~{3,})\s*([A-Za-z0-9+#._-]*)\s*$/)
+        if (fence) {
+          const closer = new RegExp('^\\s*' + (fence[1][0] === '`' ? '`{3,}' : '~{3,}') + '\\s*$')
+          const buf = []
+          i++
+          while (i < lines.length) {
+            if (closer.test(lines[i])) { i++; break }
+            buf.push(lines[i])
+            i++
           }
+          blocks.push({
+            object: 'block',
+            type: 'code',
+            code: { rich_text: splitRichText(buf.join('\n')), language: mdToNotionLang(fence[2]) },
+          })
+          continue
         }
-        return { object: 'block', type: 'paragraph', paragraph: { rich_text } }
-      })
+        blocks.push(mdLineToBlock(lines[i]))
+        i++
+      }
+      return blocks
+    }
+
+    // Notion rich_text 数组 → Markdown 行内文本
+    function notionRichTextToMd(richText) {
+      return (richText || []).map(r => {
+        let t = r.plain_text != null ? r.plain_text : ((r.text && r.text.content) || '')
+        const url = r.href || (r.text && r.text.link && r.text.link.url)
+        const a = r.annotations || {}
+        if (a.code) return '`' + t + '`'
+        if (url) t = '[' + t + '](' + url + ')'
+        if (a.bold && a.italic) return '***' + t + '***'
+        if (a.bold) return '**' + t + '**'
+        if (a.italic) return '*' + t + '*'
+        if (a.strikethrough) return '~~' + t + '~~'
+        return t
+      }).join('')
+    }
+
+    // 单个 Notion block → Markdown 行
+    function blockToMd(b) {
+      switch (b.type) {
+        case 'heading_1': return '# ' + notionRichTextToMd(b.heading_1 && b.heading_1.rich_text)
+        case 'heading_2': return '## ' + notionRichTextToMd(b.heading_2 && b.heading_2.rich_text)
+        case 'heading_3': return '### ' + notionRichTextToMd(b.heading_3 && b.heading_3.rich_text)
+        case 'bulleted_list_item': return '- ' + notionRichTextToMd(b.bulleted_list_item && b.bulleted_list_item.rich_text)
+        case 'numbered_list_item': return '1. ' + notionRichTextToMd(b.numbered_list_item && b.numbered_list_item.rich_text)
+        case 'to_do': return '- [' + ((b.to_do && b.to_do.checked) ? 'x' : ' ') + '] ' + notionRichTextToMd(b.to_do && b.to_do.rich_text)
+        case 'quote': return '> ' + notionRichTextToMd(b.quote && b.quote.rich_text)
+        case 'divider': return '---'
+        case 'code': {
+          const lang = (b.code && b.code.language) || ''
+          const tag = (!lang || lang === 'plain text') ? '' : lang
+          return '```' + tag + '\n' + notionRichTextToMd(b.code && b.code.rich_text) + '\n```'
+        }
+        case 'paragraph': return notionRichTextToMd(b.paragraph && b.paragraph.rich_text)
+        default: {
+          // 其他块类型（callout/toggle 等）：尽力提取文字，避免编辑保存时丢内容
+          const holder = b[b.type]
+          if (holder && Array.isArray(holder.rich_text)) return notionRichTextToMd(holder.rich_text)
+          return ''
+        }
+      }
     }
 
     function blocksToContent(blocks) {
-      return (blocks || [])
-        .filter(b => b.type === 'paragraph')
-        .map(b => (b.paragraph.rich_text || []).map(r => r.plain_text).join(''))
-        .join('\n')
+      return (blocks || []).map(blockToMd).join('\n')
+    }
+
+    // ===== Markdown 预览 =====
+    // 关键：预览复用 contentToBlocks（同一套解析器），因此「预览看到的」与「存进 Notion 的」必然一致。
+    let mdPreviewOn = false
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]))
+    }
+
+    function notionRichTextToHtml(richText) {
+      return (richText || []).map(r => {
+        const raw = r.plain_text != null ? r.plain_text : ((r.text && r.text.content) || '')
+        let t = escapeHtml(raw)
+        const url = r.href || (r.text && r.text.link && r.text.link.url)
+        const a = r.annotations || {}
+        if (a.code) {
+          t = '<code>' + t + '</code>'
+        } else {
+          if (a.bold && a.italic) t = '<strong><em>' + t + '</em></strong>'
+          else if (a.bold) t = '<strong>' + t + '</strong>'
+          else if (a.italic) t = '<em>' + t + '</em>'
+          if (a.strikethrough) t = '<del>' + t + '</del>'
+        }
+        if (url) {
+          const safe = safeHttpUrl(url)
+          if (safe) {
+            t = '<a href="' + escapeHtml(safe) + '" target="_blank" rel="noopener noreferrer">' + t + '</a>'
+          }
+        }
+        return t
+      }).join('')
+    }
+
+    function blocksToHtml(blocks) {
+      const out = []
+      let listTag = null
+      const closeList = () => {
+        if (listTag) { out.push('</' + listTag + '>'); listTag = null }
+      }
+      ;(blocks || []).forEach(b => {
+        // 连续的同类型列表项合并进同一个 ul / ol
+        if (b.type === 'bulleted_list_item' || b.type === 'numbered_list_item') {
+          const want = b.type === 'bulleted_list_item' ? 'ul' : 'ol'
+          if (listTag !== want) { closeList(); out.push('<' + want + '>'); listTag = want }
+          const inner = notionRichTextToHtml(b[b.type] && b[b.type].rich_text)
+          out.push('<li>' + (inner || '<br>') + '</li>')
+          return
+        }
+        closeList()
+        switch (b.type) {
+          case 'heading_1':
+            out.push('<h1>' + notionRichTextToHtml(b.heading_1 && b.heading_1.rich_text) + '</h1>')
+            break
+          case 'heading_2':
+            out.push('<h2>' + notionRichTextToHtml(b.heading_2 && b.heading_2.rich_text) + '</h2>')
+            break
+          case 'heading_3':
+            out.push('<h3>' + notionRichTextToHtml(b.heading_3 && b.heading_3.rich_text) + '</h3>')
+            break
+          case 'quote':
+            out.push('<blockquote>' + notionRichTextToHtml(b.quote && b.quote.rich_text) + '</blockquote>')
+            break
+          case 'divider':
+            out.push('<hr>')
+            break
+          case 'code': {
+            const body = ((b.code && b.code.rich_text) || [])
+              .map(r => (r.text && r.text.content) || r.plain_text || '')
+              .join('')
+            out.push('<pre><code>' + escapeHtml(body) + '</code></pre>')
+            break
+          }
+          case 'to_do': {
+            const checked = !!(b.to_do && b.to_do.checked)
+            out.push(
+              '<div class="md-todo' + (checked ? ' done' : '') + '">' +
+                '<input type="checkbox" disabled' + (checked ? ' checked' : '') + '>' +
+                '<span>' + (notionRichTextToHtml(b.to_do && b.to_do.rich_text) || '&nbsp;') + '</span>' +
+              '</div>'
+            )
+            break
+          }
+          case 'paragraph': {
+            const inner = notionRichTextToHtml(b.paragraph && b.paragraph.rich_text)
+            out.push(inner ? '<p>' + inner + '</p>' : '<p class="md-blank"></p>')
+            break
+          }
+          default: {
+            const holder = b[b.type]
+            const inner = holder && Array.isArray(holder.rich_text) ? notionRichTextToHtml(holder.rich_text) : ''
+            if (inner) out.push('<p>' + inner + '</p>')
+          }
+        }
+      })
+      closeList()
+      return out.join('')
+    }
+
+    function mdToHtml(markdown) {
+      return blocksToHtml(contentToBlocks(markdown))
+    }
+
+    function renderMdPreview() {
+      const box = document.getElementById('mdPreviewBox')
+      if (!box) return
+      const md = contentInput.value
+      box.innerHTML = md.trim()
+        ? mdToHtml(md)
+        : '<p class="md-empty">还没有内容。切回编辑写下文字，这里会显示最终排版效果。</p>'
+    }
+
+    // ===== 预览切换时保持滚动位置 =====
+    // 桌面端（≥901px）整页不滚动，正文自身才是滚动容器（.content 是 overflow-y:auto）；
+    // 小屏下则是整页滚动。两种都要兜住，否则一切换就跳回顶部。
+    // 又因为编辑框行高 2、预览行高约 1.5 还带标题/引用，两边总高度并不相等，
+    // 所以不能沿用像素滚动值，必须按比例换算。
+
+    function contentScrollRatio(el) {
+      const max = el.scrollHeight - el.clientHeight
+      return max > 1 ? el.scrollTop / max : 0
+    }
+
+    function applyContentScrollRatio(el, ratio) {
+      const max = el.scrollHeight - el.clientHeight
+      el.scrollTop = max > 0 ? ratio * max : 0
+    }
+
+    // 整页滚动时（小屏）：记录视口顶部落在元素高度的哪个比例位置
+    function pageAnchor(el) {
+      const rect = el.getBoundingClientRect()
+      const ratio = rect.height > 0 ? -rect.top / rect.height : 0
+      return {
+        inside: rect.height > 0 && ratio >= 0 && ratio <= 1,
+        ratio: Math.min(1, Math.max(0, ratio)),
+        fromBottom:
+          document.documentElement.scrollHeight - window.innerHeight - window.scrollY,
+      }
+    }
+
+    function restorePageAnchor(el, a) {
+      if (!a) return
+      // 整页没有滚动条时不用动
+      if (document.documentElement.scrollHeight <= window.innerHeight + 1) return
+      if (a.inside) {
+        const rect = el.getBoundingClientRect()
+        const dy = rect.top + a.ratio * rect.height
+        if (Math.abs(dy) > 0.5) window.scrollBy(0, dy)
+      } else {
+        const max = document.documentElement.scrollHeight - window.innerHeight
+        window.scrollTo(0, Math.max(0, max - a.fromBottom))
+      }
+    }
+
+    function setMdPreview(on) {
+      const btn = document.getElementById('mdPreviewBtn')
+      const box = document.getElementById('mdPreviewBox')
+      if (!btn || !box) return
+
+      const from = on ? contentInput : box
+      const to = on ? box : contentInput
+      const anchor = pageAnchor(from)      // 小屏：整页滚动位置
+      const ratio = contentScrollRatio(from) // 桌面端：正文内部滚动比例
+
+      mdPreviewOn = !!on
+      if (on) renderMdPreview()
+      box.hidden = !on
+      contentInput.hidden = !!on
+      btn.classList.toggle('active', !!on)
+      btn.textContent = on ? '✏️ 继续写' : '👁 预览'
+      if (!on) resizeContentInput()
+
+      const sync = () => {
+        applyContentScrollRatio(to, ratio)
+        restorePageAnchor(to, anchor)
+      }
+      sync()
+      // 隐藏「当前聚焦的元素」时，部分浏览器会在下一帧改动视口，这里再校正一次
+      requestAnimationFrame(sync)
+    }
+
+    function toggleMdPreview() {
+      setMdPreview(!mdPreviewOn)
+    }
+
+    // 切换日期 / 载入日记后，若正处于预览态则同步刷新
+    function refreshMdPreviewIfOpen() {
+      if (mdPreviewOn) renderMdPreview()
     }
 
     async function getBlocks(pageId) {
@@ -3762,6 +4262,7 @@
       renderAtts()
       updateWordCount()
       resizeContentInput()
+      refreshMdPreviewIfOpen()
       renderInsights()
     }
 
@@ -4210,6 +4711,9 @@
       resizeContentInput()
     })
     window.addEventListener('resize', resizeContentInput)
+
+    const mdPreviewBtn = document.getElementById('mdPreviewBtn')
+    if (mdPreviewBtn) mdPreviewBtn.addEventListener('click', toggleMdPreview)
 
     dateInput.addEventListener('change', () => {
       selectedDate = dateInput.value
