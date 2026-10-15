@@ -2309,7 +2309,254 @@
 }
     }
 
-</style>
+  </style>
+  <style id="mobile-layout">
+    @media (max-width: 900px) {
+      html,
+      body {
+        width: 100%;
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        display: block;
+        overflow-y: auto;
+      }
+
+      .config-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        padding: 10px max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
+      }
+
+      .config-toggle,
+      .config-test,
+      .view-tab,
+      .event-view-tab {
+        min-height: 42px;
+      }
+
+      .config-toggle {
+        display: inline-flex;
+        width: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 20px;
+      }
+
+      .config-inputs {
+        order: 2;
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .config-inputs.open { display: flex; }
+      .config-field { width: 100%; }
+      .config-field input { width: 100%; min-width: 0; font-size: 16px; }
+      .config-status { margin-right: auto; }
+
+      .view-tabs {
+        order: 1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+      }
+
+      .view-tab { min-width: 0; }
+
+      .app,
+      html[data-theme="blue"] .app,
+      html[data-theme="paper"] .app {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        gap: 12px;
+        padding: 12px 12px max(20px, env(safe-area-inset-bottom));
+        overflow: visible;
+      }
+
+      .app > * { min-width: 0; }
+
+      .sidebar,
+      html[data-theme="blue"] .sidebar,
+      html[data-theme="paper"] .sidebar {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        margin: 0 auto;
+        padding: 20px 18px;
+        overflow: visible;
+        border: 1px solid var(--ui-line);
+        border-radius: 20px;
+        background: var(--ui-surface);
+      }
+
+      html[data-theme="paper"] .sidebar { background: #f2eadf; }
+
+      .search { margin-bottom: 18px; font-size: 16px; }
+      .calendar-header { margin-bottom: 12px; }
+      .calendar-title { font-size: 15px; letter-spacing: 2px; }
+      .calendar-nav button { width: 42px; height: 42px; }
+      .days { row-gap: 4px; }
+      .day { min-height: 40px; }
+      .month-entries { margin-top: 16px; padding-top: 16px; }
+      .entries-title { margin-bottom: 8px; }
+      #entriesList { max-height: 180px; overflow-y: auto; }
+
+      .main,
+      .app.events-mode .main {
+        width: 100%;
+        max-width: 760px;
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        margin: 0 auto;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .editor,
+      .event-workspace,
+      html[data-theme="blue"] .editor,
+      html[data-theme="paper"] .editor {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        margin: 0;
+        padding: 22px 18px;
+        overflow: visible;
+        border: 1px solid var(--ui-line);
+        border-radius: 20px;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "date time" "moods moods" "save save";
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      #dateInput { grid-area: date; }
+      #timeInput { grid-area: time; }
+      .meta input { width: auto; min-width: 0; font-size: 16px; }
+
+      .moods {
+        grid-area: moods;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: 100%;
+        gap: 6px;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .mood {
+        min-width: 0;
+        min-height: 42px;
+        justify-content: center;
+        gap: 3px;
+        padding: 5px 2px;
+      }
+
+      .mood-label { display: inline; font-size: 11px; }
+      .save { grid-area: save; width: 100%; min-height: 44px; }
+      .title-input { min-width: 0; margin-bottom: 14px; font-size: clamp(22px, 6vw, 27px); }
+
+      .content,
+      html[data-theme="blue"] .content,
+      html[data-theme="paper"] .content {
+        flex: 0 0 auto;
+        width: 100%;
+        height: auto;
+        min-height: clamp(280px, 45dvh, 520px);
+        overflow: auto;
+        font-size: 16px;
+        line-height: 1.85;
+      }
+
+      textarea.content { resize: vertical; }
+      .event-fields { width: 100%; margin: 0; }
+      .event-extra.show { width: 100%; grid-template-columns: minmax(0, 1fr); }
+      .event-extra input,
+      .event-extra select,
+      .quick-event-form input,
+      .quick-event-form select,
+      .quick-event-form textarea { width: 100%; min-width: 0; font-size: 16px; }
+
+      .editor-tools { align-items: stretch; flex-direction: column; gap: 16px; }
+      .images { width: 100%; flex: none; }
+      .atts-strip { width: 100%; }
+      .att-row { max-width: 100%; min-width: 0; }
+      .footer { width: 100%; flex-wrap: wrap; gap: 8px; padding-top: 12px; border-top: 1px solid var(--ui-line); }
+      .word-count { margin-left: auto; }
+
+      .insights-panel {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        max-width: 760px;
+        height: auto;
+        max-height: none;
+        margin: 0 auto;
+        overflow: visible;
+      }
+
+      .insight-card:last-child { flex: none; }
+      .event-toolbar { align-items: flex-start; flex-wrap: wrap; }
+      #eventTimelineView,
+      #eventCalendarView { flex: 0 0 auto; width: 100%; overflow: visible; }
+      .event-calendar-day { min-height: 66px; padding: 6px; }
+      .event-detail-overlay { padding: 12px; }
+      .event-detail-modal { width: 100%; max-height: calc(100dvh - 24px); padding: 20px 16px; }
+      .image-overlay { padding: 12px; }
+      .image-overlay-img { max-width: 100%; max-height: calc(100dvh - 24px); }
+      .saved-tip { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+    }
+
+    @media (max-width: 600px) {
+      .config-bar { gap: 6px; }
+      .config-test { padding-left: 10px; padding-right: 10px; }
+      .app,
+      html[data-theme="blue"] .app,
+      html[data-theme="paper"] .app { padding-left: 8px; padding-right: 8px; }
+      .sidebar,
+      html[data-theme="blue"] .sidebar,
+      html[data-theme="paper"] .sidebar { padding: 18px 14px; }
+      .editor,
+      .event-workspace,
+      html[data-theme="blue"] .editor,
+      html[data-theme="paper"] .editor { padding: 20px 14px; }
+      .insights-panel { grid-template-columns: minmax(0, 1fr); }
+      .event-toolbar { gap: 10px; }
+      .event-view-tabs { width: 100%; }
+      .event-view-tab { flex: 1; }
+      .event-calendar-head { gap: 6px; }
+      .event-calendar-title { min-width: 0; font-size: 17px; letter-spacing: 0; text-align: center; }
+      .event-calendar-weekdays { padding: 8px 0; }
+      .event-calendar-day { min-height: 50px; padding: 5px 2px; text-align: center; }
+      .event-calendar-items { display: block; margin-top: 3px; }
+      .event-calendar-item { width: 6px; height: 6px; margin: 0 auto; padding: 0; overflow: hidden; font-size: 0; border-radius: 50%; }
+      .event-calendar-item:nth-child(n+2) { display: none; }
+      html[data-theme="paper"] .event-calendar-item { background: var(--ui-primary); }
+      .event-day-panel-head { align-items: flex-start; gap: 8px; }
+    }
+  </style>
 </head>
 
 <body>
