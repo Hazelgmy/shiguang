@@ -1111,6 +1111,61 @@
       transform: translateY(0);
     }
 
+    .save-error-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(46, 42, 36, 0.48);
+    }
+
+    .save-error-overlay[hidden] {
+      display: none;
+    }
+
+    .save-error-dialog {
+      width: min(520px, 100%);
+      max-height: calc(100dvh - 40px);
+      overflow: auto;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: 0 20px 70px rgba(46, 42, 36, 0.24);
+    }
+
+    .save-error-title {
+      margin: 0 0 14px;
+      font-size: 21px;
+      font-weight: 600;
+    }
+
+    .save-error-message {
+      margin: 0 0 24px;
+      font-size: 15px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .save-error-close {
+      display: block;
+      margin-left: auto;
+      padding: 8px 24px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .save-error-close:hover {
+      background: #eee9e0;
+    }
+
     @media (max-width: 850px) {
       .config-toggle {
         display: block;
@@ -2743,6 +2798,14 @@
 
   <div id="savedTip" class="saved-tip">Saved</div>
 
+  <div id="saveErrorOverlay" class="save-error-overlay" hidden>
+    <div class="save-error-dialog" role="alertdialog" aria-modal="true" aria-labelledby="saveErrorTitle" aria-describedby="saveErrorMessage">
+      <h2 id="saveErrorTitle" class="save-error-title">保存失败</h2>
+      <p id="saveErrorMessage" class="save-error-message"></p>
+      <button id="saveErrorClose" class="save-error-close" type="button">关闭</button>
+    </div>
+  </div>
+
   <div id="imageOverlay" class="image-overlay" style="display: none">
     <img id="imageOverlayImg" class="image-overlay-img" src="" alt="" />
   </div>
@@ -3642,35 +3705,92 @@
     }
 
     async function appendBlocks(pageId, children) {
-      const res = await fetch(PROXY_BASE + '/blocks/' + pageId + '/children', {
-        method: 'PATCH',
+      for (let i = 0; i < children.length; i += 100) {
+        const res = await fetch(PROXY_BASE + '/blocks/' + pageId + '/children', {
+          method: 'PATCH',
+          headers: getHeaders(),
+          body: JSON.stringify({ children: children.slice(i, i + 100) }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => null)
+          throw new Error('正文写入失败：' + (err && err.message ? err.message : res.status))
+        }
+      }
+    }
+
+    async function createPageWithContent(body, content) {
+      const blocks = contentToBlocks(content)
+      if (blocks.length) body.children = blocks.slice(0, 100)
+      const res = await fetch(PROXY_BASE + '/pages', {
+        method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ children }),
+        body: JSON.stringify(body),
       })
-      if (!res.ok) throw new Error('append blocks failed ' + res.status)
+      if (!res.ok) return { res }
+
+      const page = await res.json()
+      if (blocks.length > 100) {
+        try {
+          await appendBlocks(page.id, blocks.slice(100))
+        } catch (e) {
+          // 页面只创建了一部分时归档，避免用户重试后出现重复日记。
+          try {
+            const archived = await fetch(PROXY_BASE + '/pages/' + page.id, {
+              method: 'PATCH',
+              headers: getHeaders(),
+              body: JSON.stringify({ archived: true }),
+            })
+            if (!archived.ok) throw new Error('archive failed')
+          } catch (_) {
+            throw new Error('正文未完整保存，Notion 中可能留下部分页面。请检查页面 ID：' + page.id)
+          }
+          throw e
+        }
+      }
+      return { res, page }
     }
 
     async function deleteBlock(blockId) {
-      const res = await fetch(PROXY_BASE + '/blocks/' + blockId, {
-        method: 'DELETE',
-        headers: getHeaders(),
-      })
-      if (!res.ok) throw new Error('delete block failed ' + res.status)
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const res = await fetch(PROXY_BASE + '/blocks/' + blockId, {
+          method: 'DELETE',
+          headers: getHeaders(),
+        })
+        if (res.ok) return
+        if (res.status !== 429 && res.status !== 529) {
+          throw new Error('旧正文清理失败：' + res.status)
+        }
+        const retryAfter = Number(res.headers && res.headers.get('Retry-After'))
+        const delay = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : Math.min(2 ** attempt, 30) * 1000
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+      throw new Error('旧正文清理失败：请求过于频繁，请稍后重试')
     }
 
     async function replacePageBlocks(pageId, content) {
-      let existing = []
-      try {
-        existing = await getBlocks(pageId)
-      } catch (e) {
-        // 读不到旧块则忽略，继续追加
-      }
-      if (existing.length) {
-        await Promise.all(existing.map(b => deleteBlock(b.id)))
-      }
+      const existing = await getBlocks(pageId)
       const blocks = contentToBlocks(content)
       if (blocks.length) {
-        await appendBlocks(pageId, blocks)
+        try {
+          await appendBlocks(pageId, blocks)
+        } catch (e) {
+          // 追加失败时尽量移除已写入的新块，保留原正文。
+          try {
+            const oldIds = new Set(existing.map(b => b.id))
+            const added = (await getBlocks(pageId)).filter(b => !oldIds.has(b.id))
+            for (const block of added) await deleteBlock(block.id)
+          } catch (_) {
+            throw new Error(e.message + '；原正文仍在，可能留有部分新内容，请在 Notion 检查')
+          }
+          throw e
+        }
+      }
+      for (const block of existing) {
+        await deleteBlock(block.id)
+        // Notion 对连续请求有限速；长日志逐块清理时留出间隔。
+        await new Promise(resolve => setTimeout(resolve, 350))
       }
     }
 
@@ -3835,14 +3955,11 @@
       const msg = (err && err.message) || String(res && res.status)
       // 日记库还没建「附件」字段时最常见：validation_error + "附件 is not a property that exists."
       if (err && err.code === 'validation_error' && msg.indexOf('附件') >= 0) {
-        alert(
-          '日记数据库里还没有「附件」字段，所以带附件的保存会被拒绝。\n\n' +
-            '请在 Notion 的日记数据库中新增一个属性：\n' +
-            '· 名称：附件（三个字，必须一模一样）\n' +
-            '· 类型：Files & media\n\n' +
-            '建好后再点一次保存即可，已选好的文件不会丢。'
-        )
-        return '缺少「附件」字段'
+        return '日记数据库里还没有「附件」字段，所以带附件的保存会被拒绝。\n\n' +
+          '请在 Notion 的日记数据库中新增一个属性：\n' +
+          '· 名称：附件（三个字，必须一模一样）\n' +
+          '· 类型：Files & media\n\n' +
+          '建好后再点一次保存即可，已选好的文件不会丢。'
       }
       return '保存失败：' + msg
     }
@@ -4273,7 +4390,7 @@
       const token = notionToken.value.trim()
       const db = notionDb.value.trim()
       if (!token || !db) {
-        showTip('请先配置 Notion')
+        showSaveError('请先配置 Notion')
         return
       }
 
@@ -4288,7 +4405,7 @@
       if (quickEventImageFiles.length) {
         const cfg = getCloudinaryConfig()
         if (!cfg.cloud || !cfg.preset) {
-          showTip('请先配置 Cloudinary')
+          showSaveError('请先配置 Cloudinary')
           return
         }
         quickSaveBtn.disabled = true
@@ -4298,7 +4415,7 @@
         } catch (e) {
           quickSaveBtn.disabled = false
           quickSaveBtn.textContent = '保存事件'
-          showTip('图片上传失败')
+          showSaveError('图片上传失败')
           return
         }
       }
@@ -4315,20 +4432,16 @@
 
       try {
         const body = { parent: { database_id: db }, properties }
-        if (content) body.children = contentToBlocks(content)
-        const res = await fetch(PROXY_BASE + '/pages', {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify(body),
-        })
+        const created = await createPageWithContent(body, content)
+        const res = created.res
         if (!res.ok) {
           const err = await res.json()
           quickSaveBtn.disabled = false
           quickSaveBtn.textContent = '保存事件'
-          showTip(saveErrorTip(err, res))
+          showSaveError(saveErrorTip(err, res))
           return
         }
-        const page = await res.json()
+        const page = created.page
         upsertLocalEntry({
           id: page.id,
           createdTime: page.created_time || '',
@@ -4353,7 +4466,7 @@
       } catch (e) {
         quickSaveBtn.disabled = false
         quickSaveBtn.textContent = '保存事件'
-        showTip('网络错误')
+        showSaveError(e.message || '网络错误')
       }
     }
 
@@ -4521,7 +4634,7 @@
       const token = notionToken.value.trim()
       const db = notionDb.value.trim()
       if (!token || !db) {
-        showTip('请先配置 Notion')
+        showSaveError('请先配置 Notion')
         return
       }
 
@@ -4529,14 +4642,14 @@
       if (newImageFiles.length) {
         const cfg = getCloudinaryConfig()
         if (!cfg.cloud || !cfg.preset) {
-          showTip('请先配置 Cloudinary')
+          showSaveError('请先配置 Cloudinary')
           return
         }
         saveBtn.textContent = '上传中…'
         try {
           uploaded = await Promise.all(newImageFiles.map(uploadToCloudinary))
         } catch (e) {
-          showTip('图片上传失败')
+          showSaveError('图片上传失败')
           saveBtn.textContent = 'Save'
           return
         }
@@ -4553,7 +4666,7 @@
             uploadedAtts.push(await uploadAttToNotion(f))
           }
         } catch (e) {
-          showTip('文件上传失败：' + e.message)
+          showSaveError('文件上传失败：' + e.message)
           saveBtn.textContent = 'Save'
           return
         }
@@ -4607,7 +4720,7 @@
           })
           if (!res.ok) {
             const err = await res.json()
-            showTip(saveErrorTip(err, res))
+            showSaveError(saveErrorTip(err, res))
             saveBtn.textContent = 'Save'
             return
           }
@@ -4615,19 +4728,15 @@
           await replacePageBlocks(existing.id, content)
         } else {
           const body = { parent: { database_id: db }, properties }
-          if (content) body.children = contentToBlocks(content)
-          const res = await fetch(PROXY_BASE + '/pages', {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify(body),
-          })
+          const created = await createPageWithContent(body, content)
+          const res = created.res
           if (!res.ok) {
             const err = await res.json()
-            showTip(saveErrorTip(err, res))
+            showSaveError(saveErrorTip(err, res))
             saveBtn.textContent = 'Save'
             return
           }
-          page = await res.json()
+          page = created.page
         }
 
         const savedAtts = parseAttProp(page.properties && page.properties['附件'])
@@ -4659,7 +4768,7 @@
         renderCalendar()
         renderEventViews()
       } catch (e) {
-        showTip('网络错误')
+        showSaveError(e.message || '网络错误')
       }
       saveBtn.textContent = 'Save'
     }
@@ -4845,6 +4954,23 @@
       contentInput.style.height = `${contentInput.scrollHeight}px`
     }
 
+    let saveErrorReturnFocus = null
+
+    function showSaveError(message) {
+      saveErrorReturnFocus = document.activeElement
+      document.getElementById('saveErrorMessage').textContent = message
+      document.getElementById('saveErrorOverlay').hidden = false
+      document.getElementById('saveErrorClose').focus()
+    }
+
+    function closeSaveError() {
+      document.getElementById('saveErrorOverlay').hidden = true
+      if (saveErrorReturnFocus && saveErrorReturnFocus.isConnected) {
+        saveErrorReturnFocus.focus()
+      }
+      saveErrorReturnFocus = null
+    }
+
     function showTip(text) {
       const tip = document.getElementById('savedTip')
       tip.textContent = text
@@ -4940,8 +5066,13 @@
     }
 
     document.getElementById('saveBtn').onclick = saveEntry
+    document.getElementById('saveErrorClose').onclick = closeSaveError
 
     document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !document.getElementById('saveErrorOverlay').hidden) {
+        closeSaveError()
+        return
+      }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault()
         if (appMode === 'diary' && !saveBtn.disabled) saveEntry()
