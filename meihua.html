@@ -1,0 +1,1016 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>梅花易数知识库</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+
+<style>
+  /* layout: side-nav + scrollable content, stacks to single column on mobile */
+  :root {
+    --bg: #FAF8F4;
+    --bg2: #F2EDE4;
+    --fg: #2A2218;
+    --fg2: #6B5E4A;
+    --accent: #8B4513;
+    --accent-soft: #C4874A;
+    --border: #DDD5C4;
+    --wood: #6B3A2A;
+    --gold: #B8860B;
+    --tag-bg: #EDE5D8;
+    --card-bg: #FFFFFF;
+    --qian: #E8B84B;
+    --kun: #8B6914;
+    --zhen: #4A7C40;
+    --xun: #6AAB5E;
+    --kan: #2A6496;
+    --li: #C0392B;
+    --gen: #7D6B4A;
+    --dui: #3A7B8C;
+
+    --font-display: 'Noto Serif SC', 'STSong', serif;
+    --font-body: 'Noto Sans SC', 'PingFang SC', sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1A1410;
+      --bg2: #231D17;
+      --fg: #EDE0CC;
+      --fg2: #A8957E;
+      --accent: #C4874A;
+      --accent-soft: #D4A060;
+      --border: #3A2E22;
+      --wood: #B87040;
+      --gold: #D4A820;
+      --tag-bg: #2E2418;
+      --card-bg: #231D17;
+      --qian: #D4A030;
+      --kun: #A08030;
+      --zhen: #5A9C50;
+      --xun: #7AC86E;
+      --kan: #4A94C6;
+      --li: #E05040;
+      --gen: #9D8B6A;
+      --dui: #5A9BAC;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1A1410;
+    --bg2: #231D17;
+    --fg: #EDE0CC;
+    --fg2: #A8957E;
+    --accent: #C4874A;
+    --accent-soft: #D4A060;
+    --border: #3A2E22;
+    --wood: #B87040;
+    --gold: #D4A820;
+    --tag-bg: #2E2418;
+    --card-bg: #231D17;
+    --qian: #D4A030;
+    --kun: #A08030;
+    --zhen: #5A9C50;
+    --xun: #7AC86E;
+    --kan: #4A94C6;
+    --li: #E05040;
+    --gen: #9D8B6A;
+    --dui: #5A9BAC;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+  }
+
+  /* ── top bar ── */
+  header {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: var(--wood);
+    color: #F5E6C8;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    border-bottom: 2px solid var(--gold);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--wood);
+    z-index: 21;
+  }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: .05em;
+    color: #F5E6C8;
+    text-wrap: balance;
+  }
+  header .sub {
+    font-size: .75rem;
+    color: #C8B490;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  header .back-link {
+    flex: none;
+    font-size: .75rem;
+    color: #F5E6C8;
+    text-decoration: none;
+    border: 1px solid rgba(245, 230, 200, .35);
+    border-radius: 999px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    transition: .18s ease;
+  }
+  header .back-link:hover {
+    background: rgba(245, 230, 200, .14);
+    border-color: rgba(245, 230, 200, .6);
+  }
+  @media (max-width: 500px) {
+    header .sub { display: none; }
+    header .back-link { margin-left: auto; }
+  }
+
+  /* ── nav tabs ── */
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-left: max(0px, env(safe-area-inset-left, 0px));
+    padding-right: max(0px, env(safe-area-inset-right, 0px));
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 11px 18px;
+    font-family: var(--font-body);
+    font-size: .85rem;
+    color: var(--fg2);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  nav button:hover { color: var(--fg); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── main content ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+  }
+
+  section { display: none; }
+  section.active { display: block; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--wood);
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 28px 0 10px;
+    text-wrap: balance;
+  }
+  p { margin: 0 0 12px; color: var(--fg); }
+
+  /* ── 八卦 grid ── */
+  .bagua-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .gua-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .gua-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .gua-card[data-gua="乾"]::before { background: var(--qian); }
+  .gua-card[data-gua="坤"]::before { background: var(--kun); }
+  .gua-card[data-gua="震"]::before { background: var(--zhen); }
+  .gua-card[data-gua="巽"]::before { background: var(--xun); }
+  .gua-card[data-gua="坎"]::before { background: var(--kan); }
+  .gua-card[data-gua="离"]::before { background: var(--li); }
+  .gua-card[data-gua="艮"]::before { background: var(--gen); }
+  .gua-card[data-gua="兑"]::before { background: var(--dui); }
+
+  .gua-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .gua-symbol {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .gua-name {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--fg);
+  }
+  .gua-lines {
+    font-size: .8rem;
+    color: var(--fg2);
+    letter-spacing: .1em;
+  }
+
+  .gua-attrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tag {
+    background: var(--tag-bg);
+    color: var(--fg2);
+    font-size: .72rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-family: var(--font-body);
+  }
+  .tag.wuxing {
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .tag[data-wx="金"] { background: rgba(180,160,80,.18); color: var(--gold); }
+  .tag[data-wx="木"] { background: rgba(74,124,64,.15); color: var(--zhen); }
+  .tag[data-wx="水"] { background: rgba(42,100,150,.15); color: var(--kan); }
+  .tag[data-wx="火"] { background: rgba(192,57,43,.15); color: var(--li); }
+  .tag[data-wx="土"] { background: rgba(125,107,74,.15); color: var(--gen); }
+
+  .gua-xiang {
+    font-size: .82rem;
+    color: var(--fg2);
+    line-height: 1.5;
+  }
+  .gua-xiang strong { color: var(--fg); }
+
+  /* ── 生克 table ── */
+  .sk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 520px) { .sk-grid { grid-template-columns: 1fr; } }
+
+  .sk-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .sk-card h4 {
+    font-family: var(--font-display);
+    font-size: .95rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sk-badge {
+    font-size: .7rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-family: var(--font-body);
+    font-weight: 500;
+  }
+  .badge-ji { background: rgba(74,124,64,.2); color: var(--zhen); }
+  .badge-xiong { background: rgba(192,57,43,.2); color: var(--li); }
+  .badge-ping { background: rgba(125,107,74,.2); color: var(--gen); }
+  .badge-hao { background: rgba(42,100,150,.2); color: var(--kan); }
+
+  .sk-card p { font-size: .85rem; color: var(--fg2); margin: 0; }
+  .sk-card .formula {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--fg);
+    margin-bottom: 6px;
+  }
+
+  /* 五行相生相克 visual */
+  .wuxing-visual {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .wuxing-visual svg { display: block; margin: 0 auto; min-width: 260px; max-width: 340px; width: 100%; }
+
+  /* ── 起卦 methods ── */
+  .method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .method-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .method-card h4 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+  .method-card ol {
+    margin: 10px 0 0;
+    padding-left: 20px;
+    color: var(--fg2);
+    font-size: .88rem;
+  }
+  .method-card ol li { margin-bottom: 6px; }
+  .method-card .formula-box {
+    background: var(--bg2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0 0;
+    font-family: var(--font-display);
+    font-size: .9rem;
+    color: var(--fg);
+    line-height: 1.8;
+  }
+  .method-card .note {
+    font-size: .78rem;
+    color: var(--fg2);
+    margin-top: 8px;
+    padding-left: 10px;
+    border-left: 2px solid var(--border);
+  }
+
+  /* ── 互变卦 section ── */
+  .hubi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 520px) { .hubi-grid { grid-template-columns: 1fr; } }
+
+  .hubi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+  }
+  .hubi-card h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--accent);
+    margin: 0 0 6px;
+  }
+  .hubi-card p { font-size: .85rem; color: var(--fg2); margin: 0; }
+
+  /* divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* scroll to top */
+  #totop {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: max(20px, env(safe-area-inset-right, 0px));
+    background: var(--wood);
+    color: #F5E6C8;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .2s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #totop.show { opacity: .85; }
+  #totop:hover { opacity: 1; }
+
+  @media (max-width: 500px) {
+    .bagua-grid { grid-template-columns: 1fr 1fr; }
+    .gua-symbol { font-size: 1.5rem; }
+    .gua-name { font-size: 1rem; }
+  }
+</style>
+
+<header>
+  <div>
+    <h1>☯ 梅花易数知识库</h1>
+  </div>
+  <span class="sub">占筮参考</span>
+  <a class="back-link" href="./index.html">← 拾光</a>
+</header>
+
+<nav id="nav">
+  <button class="active" data-tab="bagua">八卦基本</button>
+  <button data-tab="shengke">体用生克</button>
+  <button data-tab="qigua">起卦方法</button>
+  <button data-tab="hubi">互变卦</button>
+</nav>
+
+<main>
+
+  <!-- ══ 八卦基本信息 ══ -->
+  <section id="bagua" class="active">
+    <h2>八卦基本信息</h2>
+    <p style="color:var(--fg2);font-size:.88rem;margin-bottom:20px;">五行属性、卦象数字、物象类比，梅花易数断卦的基础。</p>
+
+    <div class="bagua-grid">
+
+      <div class="gua-card" data-gua="乾">
+        <div class="gua-header">
+          <span class="gua-symbol">☰</span>
+          <span class="gua-name">乾</span>
+          <span class="gua-lines">三连</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="金">金</span>
+          <span class="tag">数 1 / 9</span>
+          <span class="tag">天·父</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>天、君、父、老人、首领<br>
+          <strong>体：</strong>头、骨、肺<br>
+          <strong>物：</strong>金玉、圆形、马
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="坤">
+        <div class="gua-header">
+          <span class="gua-symbol">☷</span>
+          <span class="gua-name">坤</span>
+          <span class="gua-lines">六断</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="土">土</span>
+          <span class="tag">数 8 / 2</span>
+          <span class="tag">地·母</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>地、母、臣、众人、柔顺<br>
+          <strong>体：</strong>腹、脾胃<br>
+          <strong>物：</strong>布帛、方形、牛
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="震">
+        <div class="gua-header">
+          <span class="gua-symbol">☳</span>
+          <span class="gua-name">震</span>
+          <span class="gua-lines">仰盂</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="木">木</span>
+          <span class="tag">数 4 / 3</span>
+          <span class="tag">雷·长男</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>雷、震动、长男、车<br>
+          <strong>体：</strong>足、肝<br>
+          <strong>物：</strong>竹木、声响、龙
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="巽">
+        <div class="gua-header">
+          <span class="gua-symbol">☴</span>
+          <span class="gua-name">巽</span>
+          <span class="gua-lines">下断</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="木">木</span>
+          <span class="tag">数 5 / 4</span>
+          <span class="tag">风·长女</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>风、木、长女、绳索<br>
+          <strong>体：</strong>股、胆<br>
+          <strong>物：</strong>木器、鸡、草绳
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="坎">
+        <div class="gua-header">
+          <span class="gua-symbol">☵</span>
+          <span class="gua-name">坎</span>
+          <span class="gua-lines">中满</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="水">水</span>
+          <span class="tag">数 6 / 1</span>
+          <span class="tag">水·中男</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>水、险、中男、盗<br>
+          <strong>体：</strong>耳、血、肾<br>
+          <strong>物：</strong>酒、弓、猪
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="离">
+        <div class="gua-header">
+          <span class="gua-symbol">☲</span>
+          <span class="gua-name">离</span>
+          <span class="gua-lines">中虚</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="火">火</span>
+          <span class="tag">数 3 / 7</span>
+          <span class="tag">火·中女</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>火、日、中女、文书<br>
+          <strong>体：</strong>目、心<br>
+          <strong>物：</strong>文字、刀、雉鸟
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="艮">
+        <div class="gua-header">
+          <span class="gua-symbol">☶</span>
+          <span class="gua-name">艮</span>
+          <span class="gua-lines">覆碗</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="土">土</span>
+          <span class="tag">数 7 / 5</span>
+          <span class="tag">山·少男</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>山、止、少男、门阙<br>
+          <strong>体：</strong>手、背、脾<br>
+          <strong>物：</strong>石、果、狗
+        </div>
+      </div>
+
+      <div class="gua-card" data-gua="兑">
+        <div class="gua-header">
+          <span class="gua-symbol">☱</span>
+          <span class="gua-name">兑</span>
+          <span class="gua-lines">上缺</span>
+        </div>
+        <div class="gua-attrs">
+          <span class="tag wuxing" data-wx="金">金</span>
+          <span class="tag">数 2 / 8</span>
+          <span class="tag">泽·少女</span>
+        </div>
+        <div class="gua-xiang">
+          <strong>象：</strong>泽、口、少女、喜悦<br>
+          <strong>体：</strong>口、舌、肺<br>
+          <strong>物：</strong>金银、废缺之物、羊
+        </div>
+      </div>
+
+    </div>
+
+    <h3>五行归属速查</h3>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);font-family:var(--font-display);">五行</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">卦</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">方位</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">季节旺</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">数（先后天）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="金">金</span></td>
+            <td style="padding:8px 12px;">乾、兑</td>
+            <td style="padding:8px 12px;">西</td>
+            <td style="padding:8px 12px;">秋</td>
+            <td style="padding:8px 12px;">乾1/9，兑2/8</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="木">木</span></td>
+            <td style="padding:8px 12px;">震、巽</td>
+            <td style="padding:8px 12px;">东</td>
+            <td style="padding:8px 12px;">春</td>
+            <td style="padding:8px 12px;">震4/3，巽5/4</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="水">水</span></td>
+            <td style="padding:8px 12px;">坎</td>
+            <td style="padding:8px 12px;">北</td>
+            <td style="padding:8px 12px;">冬</td>
+            <td style="padding:8px 12px;">坎6/1</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="火">火</span></td>
+            <td style="padding:8px 12px;">离</td>
+            <td style="padding:8px 12px;">南</td>
+            <td style="padding:8px 12px;">夏</td>
+            <td style="padding:8px 12px;">离3/7</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="土">土</span></td>
+            <td style="padding:8px 12px;">坤、艮</td>
+            <td style="padding:8px 12px;">中央</td>
+            <td style="padding:8px 12px;">季月（辰戌丑未）</td>
+            <td style="padding:8px 12px;">坤8/2，艮7/5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.78rem;color:var(--fg2);margin-top:8px;">括号内为先天八卦数 / 后天八卦数，梅花易数常用后天数起卦。</p>
+
+  </section>
+
+  <!-- ══ 体用生克 ══ -->
+  <section id="shengke">
+    <h2>体用生克</h2>
+    <p style="color:var(--fg2);font-size:.88rem;margin-bottom:20px;">梅花易数断吉凶的核心规则：先定体用，再看五行生克。</p>
+
+    <h3>如何定体用</h3>
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:20px;">
+      <p style="margin:0;font-size:.9rem;">动爻所在卦为<strong>用卦</strong>，另一卦为<strong>体卦</strong>。</p>
+      <ul style="margin:10px 0 0;padding-left:20px;font-size:.85rem;color:var(--fg2);">
+        <li>动爻在<strong>下卦</strong>：下卦为用，上卦为体</li>
+        <li>动爻在<strong>上卦</strong>：上卦为用，下卦为体</li>
+        <li>全卦无动爻（静卦）：以上卦为用，下卦为体</li>
+      </ul>
+    </div>
+
+    <h3>五行相生相克</h3>
+    <div class="wuxing-visual">
+      <svg viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrowS" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#5A9C50"/>
+          </marker>
+          <marker id="arrowK" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#C0392B"/>
+          </marker>
+        </defs>
+        <!-- nodes: 木(top), 火(upper-right), 土(lower-right), 金(lower-left), 水(upper-left) -->
+        <!-- 木 -->
+        <circle cx="150" cy="40" r="28" fill="#4A7C4022" stroke="#4A7C40" stroke-width="1.5"/>
+        <text x="150" y="36" text-anchor="middle" font-size="14" fill="#4A7C40" font-family="serif" font-weight="600">木</text>
+        <text x="150" y="52" text-anchor="middle" font-size="10" fill="#4A7C40">震·巽</text>
+        <!-- 火 -->
+        <circle cx="256" cy="115" r="28" fill="#C0392B22" stroke="#C0392B" stroke-width="1.5"/>
+        <text x="256" y="111" text-anchor="middle" font-size="14" fill="#C0392B" font-family="serif" font-weight="600">火</text>
+        <text x="256" y="127" text-anchor="middle" font-size="10" fill="#C0392B">离</text>
+        <!-- 土 -->
+        <circle cx="210" cy="225" r="28" fill="#7D6B4A22" stroke="#7D6B4A" stroke-width="1.5"/>
+        <text x="210" y="221" text-anchor="middle" font-size="14" fill="#7D6B4A" font-family="serif" font-weight="600">土</text>
+        <text x="210" y="237" text-anchor="middle" font-size="10" fill="#7D6B4A">坤·艮</text>
+        <!-- 金 -->
+        <circle cx="90" cy="225" r="28" fill="#B8860B22" stroke="#B8860B" stroke-width="1.5"/>
+        <text x="90" y="221" text-anchor="middle" font-size="14" fill="#B8860B" font-family="serif" font-weight="600">金</text>
+        <text x="90" y="237" text-anchor="middle" font-size="10" fill="#B8860B">乾·兑</text>
+        <!-- 水 -->
+        <circle cx="44" cy="115" r="28" fill="#2A649622" stroke="#2A6496" stroke-width="1.5"/>
+        <text x="44" y="111" text-anchor="middle" font-size="14" fill="#2A6496" font-family="serif" font-weight="600">水</text>
+        <text x="44" y="127" text-anchor="middle" font-size="10" fill="#2A6496">坎</text>
+
+        <!-- 相生 arrows (顺时针): 木→火→土→金→水→木 -->
+        <path d="M168,58 Q212,66 240,100" stroke="#5A9C50" stroke-width="1.5" fill="none" marker-end="url(#arrowS)"/>
+        <path d="M253,143 Q242,182 226,202" stroke="#5A9C50" stroke-width="1.5" fill="none" marker-end="url(#arrowS)"/>
+        <path d="M182,226 Q140,235 118,226" stroke="#5A9C50" stroke-width="1.5" fill="none" marker-end="url(#arrowS)"/>
+        <path d="M68,206 Q50,172 53,143" stroke="#5A9C50" stroke-width="1.5" fill="none" marker-end="url(#arrowS)"/>
+        <path d="M57,97 Q88,55 128,45" stroke="#5A9C50" stroke-width="1.5" fill="none" marker-end="url(#arrowS)"/>
+
+        <!-- 相克 arrows (间隔): 木→土, 火→金, 土→水, 金→木, 水→火 -->
+        <path d="M164,62 Q200,140 190,202" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowK)"/>
+        <path d="M232,130 Q190,175 120,210" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowK)"/>
+        <path d="M185,238 Q130,260 72,240" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowK)"/>
+        <path d="M70,200 Q80,130 136,62" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowK)"/>
+        <path d="M64,100 Q152,40 228,98" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" fill="none" marker-end="url(#arrowK)"/>
+
+        <!-- legend -->
+        <line x1="20" y1="265" x2="50" y2="265" stroke="#5A9C50" stroke-width="1.5" marker-end="url(#arrowS)"/>
+        <text x="55" y="269" font-size="10" fill="#5A9C50">相生</text>
+        <line x1="120" y1="265" x2="150" y2="265" stroke="#C0392B" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arrowK)"/>
+        <text x="155" y="269" font-size="10" fill="#C0392B">相克</text>
+      </svg>
+    </div>
+
+    <h3>四种生克关系断吉凶</h3>
+    <div class="sk-grid">
+      <div class="sk-card">
+        <h4><span class="sk-badge badge-ji">吉</span> 用生体</h4>
+        <p class="formula">用卦五行 → 生 → 体卦五行</p>
+        <p>用来生助体，外部助力来支持本身，事情顺遂，宜求、宜动。</p>
+      </div>
+      <div class="sk-card">
+        <h4><span class="sk-badge badge-ji">吉</span> 体用比和</h4>
+        <p class="formula">体 = 用（同五行）</p>
+        <p>体用同气，势力相当，事情平稳顺利，无大波折，利于合作、维持现状。</p>
+      </div>
+      <div class="sk-card">
+        <h4><span class="sk-badge badge-hao">次吉</span> 体生用</h4>
+        <p class="formula">体卦五行 → 生 → 用卦五行</p>
+        <p>体去生用，自身耗泄，要付出力气，事可成但费神。宜防消耗过度。</p>
+      </div>
+      <div class="sk-card">
+        <h4><span class="sk-badge badge-xiong">凶</span> 用克体</h4>
+        <p class="formula">用卦五行 → 克 → 体卦五行</p>
+        <p>外力来压制本身，最为不利，事情受阻、有损害，需谨慎防范。</p>
+      </div>
+    </div>
+
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:20px;">
+      <p style="margin:0;font-size:.85rem;color:var(--fg2);">
+        ⚠️ <strong style="color:var(--fg);">注意：</strong>体克用（体卦克用卦）通常理解为"尚可，能控制局面但需耗力"，不同流派说法略有差异，以所用书籍为准。
+      </p>
+    </div>
+
+    <h3>月令对体的影响</h3>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
+        <thead>
+          <tr style="background:var(--bg2);">
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">月令季节</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">旺盛五行</th>
+            <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border);">对断卦影响</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;">春（寅卯辰）</td>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="木">木旺</span></td>
+            <td style="padding:8px 12px;">震、巽为体时最旺，克力与生力更强</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;">夏（巳午未）</td>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="火">火旺</span></td>
+            <td style="padding:8px 12px;">离为体时旺，木卦次旺</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;">秋（申酉戌）</td>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="金">金旺</span></td>
+            <td style="padding:8px 12px;">乾、兑为体时最旺</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px;">冬（亥子丑）</td>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="水">水旺</span></td>
+            <td style="padding:8px 12px;">坎为体时最旺，金卦次旺</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;">季月（辰戌丑未）</td>
+            <td style="padding:8px 12px;"><span class="tag wuxing" data-wx="土">土旺</span></td>
+            <td style="padding:8px 12px;">坤、艮为体时旺</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.78rem;color:var(--fg2);margin-top:8px;">体旺则克力更强、生力也更足；体衰时即便体克用，克制力也弱。</p>
+
+  </section>
+
+  <!-- ══ 起卦方法 ══ -->
+  <section id="qigua">
+    <h2>起卦方法</h2>
+    <p style="color:var(--fg2);font-size:.88rem;margin-bottom:20px;">梅花易数"随物起数，随数起卦"，以下为常用方法，统一以后天八卦数为准（乾1 兑2 离3 震4 巽5 坎6 艮7 坤8）。</p>
+
+    <div class="method-list">
+
+      <div class="method-card">
+        <h4>① 时间起卦（年月日时法）</h4>
+        <p style="color:var(--fg2);font-size:.85rem;margin-bottom:8px;">以起卦当下的年月日时数字求卦，最为常用。</p>
+        <div class="formula-box">
+          上卦 = （年数 + 月数 + 日数）÷ 8 取余数<br>
+          下卦 = （年数 + 月数 + 日数 + 时数）÷ 8 取余数<br>
+          动爻 = （年数 + 月数 + 日数 + 时数）÷ 6 取余数
+        </div>
+        <div class="note">
+          年数：天干数（甲1 乙2 丙3 丁4 戊5 己6 庚7 辛8 壬9 癸10）<br>
+          月数：农历月份（正月1…十二月12）<br>
+          日数：农历日期<br>
+          时数：时辰序数（子1 丑2 寅3 卯4 辰5 巳6 午7 未8 申9 酉10 戌11 亥12）<br>
+          余数为0时，上下卦取8（坤），动爻取6
+        </div>
+      </div>
+
+      <div class="method-card">
+        <h4>② 字数起卦（二字占）</h4>
+        <p style="color:var(--fg2);font-size:.85rem;margin-bottom:8px;">以两个汉字的笔画数起卦，简便快捷。</p>
+        <div class="formula-box">
+          上卦 = 第一字笔画数 ÷ 8 取余数<br>
+          下卦 = 第二字笔画数 ÷ 8 取余数<br>
+          动爻 = （第一字 + 第二字笔画数之和）÷ 6 取余数
+        </div>
+        <div class="note">
+          余数为0：上下卦取8（坤），动爻取6<br>
+          例：「人囚」→ 人2 / 囚5 / 合7；上卦=2(兑) 下卦=5(巽) 动爻=7÷6余1（初爻动）
+        </div>
+      </div>
+
+      <div class="method-card">
+        <h4>③ 多字起卦（字数法通用）</h4>
+        <p style="color:var(--fg2);font-size:.85rem;margin-bottom:8px;">以一组字的总笔画数起卦，适用于问题较具体时。</p>
+        <div class="formula-box">
+          上卦 = 总笔画数 ÷ 8 取余数<br>
+          下卦 = （总笔画数 + 时数）÷ 8 取余数<br>
+          动爻 = （总笔画数 + 时数）÷ 6 取余数
+        </div>
+        <div class="note">不加时数的版本：动爻 = 总笔画数 ÷ 6 取余数，各家略有不同，以所用教材为准。</div>
+      </div>
+
+      <div class="method-card">
+        <h4>④ 数目起卦</h4>
+        <p style="color:var(--fg2);font-size:.85rem;margin-bottom:8px;">以一个数目（如抓来的数、随机报的数）直接起卦。</p>
+        <div class="formula-box">
+          上卦 = 所得数 ÷ 8 取余数<br>
+          下卦 = （所得数 + 时数）÷ 8 取余数<br>
+          动爻 = （所得数 + 时数）÷ 6 取余数
+        </div>
+      </div>
+
+      <div class="method-card">
+        <h4>⑤ 物象起卦（见物取象）</h4>
+        <p style="color:var(--fg2);font-size:.85rem;margin-bottom:8px;">见到某物或听到某声，直接以其数取卦，属"外应"性质。</p>
+        <div class="formula-box">
+          据所见之物的数目或类象直接定上下卦<br>
+          外应单独作为验证，不另算动爻
+        </div>
+        <div class="note">
+          例：见两只鸟飞走 → 上卦取2（兑），结合时数定下卦与动爻。<br>
+          外应是卦成后的应验之象，用以辅助判断，非单独断吉凶。
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+    <h3>八卦数对照（后天）</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+      <span class="tag">乾 = <strong>1</strong></span>
+      <span class="tag">兑 = <strong>2</strong></span>
+      <span class="tag">离 = <strong>3</strong></span>
+      <span class="tag">震 = <strong>4</strong></span>
+      <span class="tag">巽 = <strong>5</strong></span>
+      <span class="tag">坎 = <strong>6</strong></span>
+      <span class="tag">艮 = <strong>7</strong></span>
+      <span class="tag">坤 = <strong>8</strong></span>
+    </div>
+    <p style="font-size:.78rem;color:var(--fg2);">余数为0时，统一取8（坤）；动爻余数为0时取6。</p>
+
+  </section>
+
+  <!-- ══ 互变卦 ══ -->
+  <section id="hubi">
+    <h2>互卦与变卦</h2>
+    <p style="color:var(--fg2);font-size:.88rem;margin-bottom:20px;">本卦看现状，互卦看过程，变卦看结果——三卦合参方能全面断吉凶。</p>
+
+    <div class="hubi-grid">
+      <div class="hubi-card">
+        <h4>本卦</h4>
+        <p>起卦所得，反映事情的当下状态与起始背景，体用关系由此定。</p>
+      </div>
+      <div class="hubi-card">
+        <h4>互卦</h4>
+        <p>由本卦二三四爻组成上互，三四五爻组成下互，代表事情发展的中间过程。</p>
+      </div>
+      <div class="hubi-card">
+        <h4>变卦</h4>
+        <p>动爻变后所得之卦，代表事情的最终走向与结果。体用生克同样适用于变卦。</p>
+      </div>
+      <div class="hubi-card">
+        <h4>外应</h4>
+        <p>起卦时或起卦前后所见所闻之物象，作为旁证辅助印证卦意，不单独断吉凶。</p>
+      </div>
+    </div>
+
+    <h3>互卦取法示例</h3>
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:20px;overflow-x:auto;">
+      <p style="margin:0 0 12px;font-size:.88rem;">以「艮为山」（上艮下艮）为例，上爻→初爻依次为：</p>
+      <div style="font-family:var(--font-display);font-size:.9rem;line-height:2;min-width:220px;">
+        <div style="display:flex;gap:20px;align-items:flex-start;">
+          <div>
+            <div style="color:var(--fg2);font-size:.75rem;margin-bottom:4px;">本卦各爻</div>
+            <div>上九 ─── （第6爻）</div>
+            <div>六五 ─ ─ （第5爻）</div>
+            <div>六四 ─ ─ （第4爻）</div>
+            <div style="border-top:1px dashed var(--border);margin:4px 0;"></div>
+            <div>九三 ─── （第3爻）</div>
+            <div>六二 ─ ─ （第2爻）</div>
+            <div>初六 ─ ─ （第1爻）</div>
+          </div>
+          <div>
+            <div style="color:var(--fg2);font-size:.75rem;margin-bottom:4px;">互卦取爻</div>
+            <div style="color:var(--fg2);">—</div>
+            <div style="color:var(--zhen);">← 上互上爻（5）</div>
+            <div style="color:var(--zhen);">← 上互中爻（4）</div>
+            <div style="border-top:1px dashed var(--border);margin:4px 0;"></div>
+            <div style="color:var(--zhen);">← 上互下爻 / 下互上爻（3）</div>
+            <div style="color:var(--kan);">← 下互中爻（2）</div>
+            <div style="color:var(--fg2);">—</div>
+          </div>
+        </div>
+        <p style="margin-top:12px;font-size:.82rem;color:var(--fg2);">上互：5·4·3爻 → 震·坎 → 上震下坎 = <strong style="color:var(--fg);">雷水解</strong></p>
+      </div>
+    </div>
+
+    <h3>三卦断法口诀</h3>
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:16px 18px;">
+      <ul style="margin:0;padding-left:20px;font-size:.88rem;color:var(--fg);line-height:2;">
+        <li>本卦生体 → 事情起始有利，宜顺势而为</li>
+        <li>互卦克体 → 过程有阻力，需留意中间变化</li>
+        <li>变卦生体 → 结果转好，坚持可得善果</li>
+        <li>变卦克体 → 结果不佳，需及早调整方向</li>
+        <li>三卦皆生体或比和 → 全程顺遂，大吉</li>
+        <li>三卦皆克体 → 全程不利，需慎重</li>
+      </ul>
+      <p style="font-size:.78rem;color:var(--fg2);margin:10px 0 0;padding-top:10px;border-top:1px solid var(--border);">
+        实际断卦需综合月令旺衰、爻辞、外应等多方面，不可只看一条规则。
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+<button id="totop" aria-label="回到顶部">↑</button>
+
+<script>
+  // tab switching
+  const nav = document.getElementById('nav');
+  const tabs = nav.querySelectorAll('button');
+  const sections = document.querySelectorAll('main section');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById(btn.dataset.tab);
+      if (target) target.classList.add('active');
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+  });
+
+  // scroll to top button
+  const totop = document.getElementById('totop');
+  window.addEventListener('scroll', () => {
+    totop.classList.toggle('show', window.scrollY > 300);
+  });
+  totop.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+</script>
+
+</body></html>
